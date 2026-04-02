@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
 <title>Xpense</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
-<!-- Google Sign-In -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
@@ -16,38 +15,29 @@
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
-
-/* ── LOGIN SCREEN ── */
 .login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--ink);}
 .login-card{background:var(--card);border-radius:20px;padding:40px 36px;width:100%;max-width:380px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.3);}
-.login-logo{font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:-0.04em;margin-bottom:4px;}
-.login-logo span{color:var(--amber);}
+.login-logo{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:4px;}
+.login-logo img{width:56px;height:56px;object-fit:contain;}
+.login-logo-text{font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:-0.04em;}
+.login-logo-text span{color:var(--amber);}
 .login-sub{font-size:13px;color:var(--ink3);margin-bottom:32px;}
-.login-divider{font-size:11px;color:var(--ink3);margin:20px 0;}
 .login-note{font-size:11px;color:var(--ink3);margin-top:20px;line-height:1.5;}
-
-/* ── TOPBAR ── */
 .topbar{background:var(--ink);color:#fff;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90;}
 .topbar-brand{font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;}
-.topbar-dot{width:7px;height:7px;background:var(--amber);border-radius:50%;}
+.topbar-brand img{width:24px;height:24px;object-fit:contain;}
 .topbar-right{display:flex;align-items:center;gap:8px;}
 .topbar-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:7px;padding:5px 11px;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:0.04em;cursor:pointer;transition:background 0.15s;}
 .topbar-btn:hover{background:rgba(255,255,255,0.2);}
 .topbar-btn.admin{background:rgba(217,119,6,0.3);border-color:rgba(217,119,6,0.5);}
 .user-avatar{width:28px;height:28px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
 .user-avatar img{width:100%;height:100%;object-fit:cover;}
-
-/* ── MAIN ── */
 .main{max-width:880px;margin:0 auto;padding:20px 14px 60px;}
 .view{display:none;}.view.active{display:block;}
-
-/* ── LOADING ── */
 .loading{text-align:center;padding:60px 20px;}
 .spinner{width:32px;height:32px;border:3px solid var(--rule);border-top-color:var(--ink);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;}
 @keyframes spin{to{transform:rotate(360deg);}}
 .loading-text{font-size:13px;color:var(--ink3);}
-
-/* ── TRIPS LIST ── */
 .trips-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
 .trips-heading{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-0.03em;}
 .btn-primary{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:var(--display);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity 0.15s;}
@@ -63,36 +53,31 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .trip-total{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-0.02em;text-align:right;flex-shrink:0;}
 .trip-count{font-size:11px;color:var(--ink3);text-align:right;margin-top:2px;}
 .trip-arrow{color:var(--ink3);font-size:16px;flex-shrink:0;}
-
-/* ── EMPTY ── */
+.trip-rename-btn{background:none;border:1px solid var(--rule);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--ink3);cursor:pointer;flex-shrink:0;opacity:0;transition:opacity 0.15s,border-color 0.15s;}
+.trip-card:hover .trip-rename-btn{opacity:1;}
+.trip-rename-btn:hover{border-color:var(--ink3);color:var(--ink);}
 .empty-state{text-align:center;padding:60px 20px;}
 .empty-emoji{font-size:48px;margin-bottom:12px;}
 .empty-title{font-family:var(--display);font-weight:700;font-size:18px;margin-bottom:6px;}
 .empty-sub{font-size:14px;color:var(--ink3);margin-bottom:20px;}
-
-/* ── ADMIN BANNER ── */
 .admin-bar{background:linear-gradient(90deg,#78350f,#92400e);color:#fef3c7;padding:10px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
 .admin-bar-title{font-family:var(--display);font-weight:700;font-size:13px;}
 .admin-bar-sub{font-size:11px;opacity:0.8;}
 .admin-filter{display:flex;align-items:center;gap:8px;}
 .admin-select{padding:5px 10px;border-radius:7px;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.2);color:#fef3c7;font-size:12px;font-family:var(--sans);cursor:pointer;outline:none;}
-
-/* ── ADMIN SUMMARY CARDS ── */
 .admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
 @media(max-width:600px){.admin-stats{grid-template-columns:1fr 1fr;}}
 .admin-stat{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;}
 .admin-stat-label{font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
 .admin-stat-val{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-0.03em;}
-
-/* ── DETAIL ── */
 .detail-topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
 .back-btn{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;gap:4px;transition:border-color 0.15s;flex-shrink:0;}
 .back-btn:hover{border-color:var(--ink3);}
 .detail-title{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-0.02em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .detail-export{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-family:var(--display);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;flex-shrink:0;transition:all 0.15s;}
 .detail-export:hover{border-color:var(--ink3);}
-
-/* ── SUMMARY STRIP ── */
+.detail-rename{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-family:var(--display);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;flex-shrink:0;transition:all 0.15s;}
+.detail-rename:hover{border-color:var(--ink3);}
 .summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
 @media(max-width:480px){.summary-strip{grid-template-columns:1fr 1fr;}}
 .sum-card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;}
@@ -100,8 +85,6 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .sum-value{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.03em;}
 .sum-value.amber{color:var(--amber);}
 .sum-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
-
-/* ── ADD PANEL ── */
 .add-panel{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);margin-bottom:16px;overflow:hidden;}
 .add-panel-head{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:border-color 0.15s;}
 .add-panel-head.open{border-color:var(--rule);}
@@ -110,8 +93,6 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .add-toggle.open{transform:rotate(45deg);}
 .add-form{display:none;padding:16px;}
 .add-form.open{display:block;}
-
-/* ── FORM ── */
 .fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
 .fg.full{grid-template-columns:1fr;}
 @media(max-width:520px){.fg{grid-template-columns:1fr;}.mf.open{grid-template-columns:1fr!important;}}
@@ -148,8 +129,6 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .btn-save{background:var(--ink);border:none;border-radius:8px;padding:8px 20px;font-family:var(--display);font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity 0.15s;}
 .btn-save:hover{opacity:0.82;}
 .btn-save:disabled{opacity:0.4;cursor:not-allowed;}
-
-/* ── EXPENSE LIST ── */
 .exp-list-card{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;}
 .exp-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--rule);transition:background 0.1s;animation:fadeUp 0.18s ease both;}
 .exp-row:last-child{border-bottom:none;}
@@ -164,8 +143,6 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .exp-row:hover .exp-del{opacity:1;}
 .exp-del:hover{color:var(--red);background:var(--red-bg);}
 .empty-list{padding:32px 16px;text-align:center;font-size:13px;color:var(--ink3);}
-
-/* ── MODALS ── */
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
 .overlay.open{display:flex;}
 .modal{background:var(--card);border-radius:14px;padding:24px;width:100%;max-width:400px;box-shadow:0 16px 48px rgba(0,0,0,0.2);animation:popIn 0.18s ease;}
@@ -178,33 +155,27 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .icon-picker{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px;}
 .icon-btn{font-size:22px;background:none;border:2px solid var(--rule);border-radius:8px;width:40px;height:40px;cursor:pointer;transition:border-color 0.12s;}
 .icon-btn.sel{border-color:var(--ink);}
-
-/* ── ERROR TOAST ── */
 .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;display:none;animation:fadeUp 0.2s ease;}
 .toast.vis{display:block;}
-
-/* ── LIGHTBOX ── */
 .lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:300;align-items:center;justify-content:center;cursor:pointer;}
 .lightbox.open{display:flex;}
 .lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;object-fit:contain;}
-
-/* ── CONFIG NOTICE ── */
 .config-notice{background:#fef3c7;border:1px solid #f59e0b;border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13px;line-height:1.6;}
 .config-notice strong{font-weight:600;}
 .config-notice code{background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;}
-
-@media print{.topbar,.add-panel,.back-btn,.detail-export,.exp-del,.topbar-right,.admin-bar{display:none!important;}body{background:white;}.main{padding:0;}.exp-list-card,.sum-card{box-shadow:none;border:1px solid #ddd;}}
+@media print{.topbar,.add-panel,.back-btn,.detail-export,.detail-rename,.exp-del,.topbar-right,.admin-bar{display:none!important;}body{background:white;}.main{padding:0;}.exp-list-card,.sum-card{box-shadow:none;border:1px solid #ddd;}}
 </style>
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ── -->
+<!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
-    <div class="login-logo">X<span>.</span>pense</div>
+    <div class="login-logo">
+      <img src="data:image/png;base64,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" alt="Synergy Solutions"/>
+      <div class="login-logo-text">X<span>.</span>pense</div>
+    </div>
     <div class="login-sub">Business Expense Tracking</div>
-
-    <!-- Google Sign-In button rendered here -->
     <div id="g_id_onload"
       data-client_id="1039086156302-29g6ar5o63ememg0k81bltr5096delmc.apps.googleusercontent.com"
       data-callback="handleGoogleSignIn"
@@ -219,18 +190,17 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
       data-logo_alignment="left"
       data-width="280">
     </div>
-
-    <div class="login-note">
-      Sign in with your Google account.<br/>
-      Your expenses are private to you.
-    </div>
+    <div class="login-note">Sign in with your Google account.<br/>Your expenses are private to you.</div>
   </div>
 </div>
 
-<!-- ── APP ── -->
+<!-- APP -->
 <div id="appShell" style="display:none;">
   <header class="topbar">
-    <div class="topbar-brand"><div class="topbar-dot"></div>X.pense</div>
+    <div class="topbar-brand">
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAEV0lEQVR42pWWT2yUVRTFf/d+30zLn3a+QTHEhXFrqHEhroBSsBAgauvCLiiJsjIxBrEJunBBXLhgATUxbk0A66JswEjUSOyfKS0IbiwY124Ekc5M/04737vXRWdKW1qFt3vJyznn3XfuuQ/WWd5P5KfQ+j4t5Lt8KLkThpLfvZDvWjp3CvV+ovVwZC1g3sJEcAAfSd4wlQ9VPcuc9xIBGenBZR7zXtlV+hbAHeEiKl2Ex1JcHc51htF8wceSGz6SdD9yfjTpDmPJLz6aL/hwrnPdG60G9pGkI4zmh/16cj1dBuwDxO6IO+IDxMvOd/tYcsPH8sM+knSsT3Qt11kH9tH8kVXAWhOT9X6ytZLo4xBJdSB/MG7gfcSfwfhCdpYu1IFpw0Qw7yfLs7kjFuRjAMVPc6/8jXSx4I4yiMpe0jqRRXygxgxBTovfzLvN2fmotfx2XZkIVlfMtly3IT3aKC1UfFFWo8A847j1crfct0QEvmSO4eQ9hC8lDCQpSgVlzIKczbQVv/dCLh+MDoETukFfouLYAqlukhjAZjzVLDGNglX8tuJn2VLukxYW/BYZ2UF1oj+fyz1lf4r9nLgIsEEgApu0r3H5S7fpSargDwxpFkjBKn4Jd9EN2oGAzXrQRonIgk3abdXqftpm74ngPpB73oxxrZUFm/Yq87jCHk1Kn/BP2GdT9qNslCIV+ki9LdpXejN6tdyJ+x5SviOD27ynTHrQBm0h6JZ6iVANi+/1sOUiBAGZlleoSlt5IGotHST1M6lzQVpLQ3Vby87SsOwuvk7K57pZYgO3eQ9kJV3dL7pGb6sb4rfJuiNUaYq3yg9hKPnJB3LtNYc1uqNucn9ZFijVR5NB18sQthNEcIOYGQ+akXacy2zNNXGfKo+5dJ18etjZLn8TL3akucyw0SLpIohgor61VnEAI7NstyaBAE4qQuDiYrNFUfEsRV4z82sImwlTswtXk92hkFwh5oRNe6og2iARCx6vJohXwKc4MVvmB/MvSltxfOlRu4pXgCs+0HzQKsmlTCMHiGS1Tcc1sgl3RATHLAJQB3MIIohVHWBbVv2WF5Kv/Fq+pR6/7kRMTQ7j7CYlsOBok0QExsOsHdNc+WXZO3uXX2ui56IJwGLNihJDmHYXxSxFVcjSJMeY824vJH0E6RUpjvstoAw0ScSs/cac97Kp3BfvoOqO1tQvGmCzHVWRZvGr+UMW+wltkAMI2Iwb4ICrENMk2JxXCZwPgXMZ9c9CxLnoj/J5eXcR+D/Dbsktheb95npSY9mPriQSIZacQNnKVKLn5PDEpDsRg8hyYCKOg8wT/IzsKl0GEO8n4g4un9YSdC0ixzQDGGWi9AXCdHGV4uO6CthPoWxHZMUsXk2EfqSxtCNAxcF4IPtKT9eAj1rEcVzmLbUzmdbypRXANXOsPfRXEOXacekhlkNWsSkXeiQr72gkVdInGPr/+wkYzB8OQ8lNH0r+eJJvy79IEppejI1pCgAAAABJRU5ErkJggg==" alt=""/>
+      X.pense
+    </div>
     <div class="topbar-right">
       <button class="topbar-btn" onclick="exportAllCSV()">↓ All CSV</button>
       <button class="topbar-btn admin" id="adminBtn" onclick="toggleAdminView()" style="display:none;">⚙ Admin</button>
@@ -239,15 +209,12 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   </header>
 
   <main class="main">
-
-    <!-- CONFIG NOTICE (shown until script URL is set) -->
-    <div class="config-notice" id="configNotice">
-      <strong>⚙️ Setup Required:</strong> Open this file, find <code>APPS_SCRIPT_URL</code> near the top of the &lt;script&gt; tag, and replace it with your Google Apps Script web app URL. See the setup guide below.
+    <div class="config-notice" id="configNotice" style="display:none;">
+      <strong>⚙️ Setup Required:</strong> Configure <code>APPS_SCRIPT_URL</code> in the script section.
     </div>
 
     <!-- TRIPS VIEW -->
     <div class="view active" id="viewTrips">
-      <!-- Admin bar (admin only) -->
       <div class="admin-bar" id="adminBar" style="display:none;">
         <div>
           <div class="admin-bar-title">⚙️ Admin View</div>
@@ -259,7 +226,6 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
           </select>
         </div>
       </div>
-
       <div class="trips-header">
         <div class="trips-heading" id="tripsHeading">My Trips</div>
         <button class="btn-primary" onclick="openNewTrip()">＋ New Trip</button>
@@ -272,16 +238,14 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
       <div class="detail-topbar">
         <button class="back-btn" onclick="goBack()">← Back</button>
         <div class="detail-title" id="detailTitle"></div>
+        <button class="detail-rename" id="renameBtn" onclick="openRenameModal()">✏️ Rename</button>
         <button class="detail-export" onclick="exportTripCSV()">↓ CSV</button>
       </div>
-
       <div class="summary-strip">
         <div class="sum-card"><div class="sum-label">Total</div><div class="sum-value amber" id="sumTotal">—</div><div class="sum-sub" id="sumCount"></div></div>
         <div class="sum-card"><div class="sum-label">Mileage</div><div class="sum-value" id="sumMiles">—</div><div class="sum-sub" id="sumMiCost"></div></div>
         <div class="sum-card"><div class="sum-label">Receipts</div><div class="sum-value" id="sumRec">—</div><div class="sum-sub">attached</div></div>
       </div>
-
-      <!-- Add Panel (hidden for admin viewing others' trips) -->
       <div class="add-panel" id="addPanelWrap">
         <div class="add-panel-head" id="addHead" onclick="toggleAdd()">
           <span class="add-panel-title">Add Expense</span>
@@ -300,8 +264,8 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
           <div class="mf" id="miFields">
             <div class="field"><label>Start Odo</label><input type="number" id="fOdoS" placeholder="45200"/></div>
             <div class="field"><label>End Odo</label><input type="number" id="fOdoE" placeholder="45258"/></div>
-            <div class="field"><label>Rate ($/mi)</label><input type="number" id="fRate" value="0.70" step="0.01"/></div>
-            <div class="mi-note">IRS 2025: $0.70/mi</div>
+            <div class="field"><label>Rate ($/mi)</label><input type="number" id="fRate" value="0.725" step="0.001"/></div>
+            <div class="mi-note">Current rate: $0.725/mi</div>
           </div>
           <div class="fg" id="amtRow">
             <div class="field"><label>Amount ($)</label><input type="number" id="fAmt" placeholder="0.00" step="0.01" min="0"/></div>
@@ -326,10 +290,8 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
           </div>
         </div>
       </div>
-
       <div class="exp-list-card"><div id="expRows"></div></div>
     </div>
-
   </main>
 </div>
 
@@ -346,6 +308,18 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   </div>
 </div>
 
+<!-- RENAME TRIP MODAL -->
+<div class="overlay" id="renameModal">
+  <div class="modal">
+    <div class="modal-title">Rename Trip</div>
+    <div><span class="modal-label">New Name</span><input class="modal-input" type="text" id="renameTripInput" placeholder="Enter new trip name"/></div>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeRenameModal()">Cancel</button>
+      <button class="btn-save" id="renameTripBtn" onclick="confirmRename()">Save</button>
+    </div>
+  </div>
+</div>
+
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
   <img id="lbImg" src="" alt="Receipt"/>
@@ -355,12 +329,8 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 <div class="toast" id="toast"></div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-// ⚙️  CONFIGURATION — CHANGE THESE TWO VALUES
-// ═══════════════════════════════════════════════════════════
 const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/synergy-solutionsllc.com/s/AKfycbylgIgxoLOJJdvFLMso-_PDJdaBvxF_GQs_-pYKOWSQ7lLc2XV5QisVwsFr6e9Bm-ml/exec';
 const ADMIN_EMAIL     = 'jmullins@synergy-solutionsllc.com';
-// ═══════════════════════════════════════════════════════════
 
 const CATS = [
   {id:'meals',   label:'Meals',   icon:'🍽️', bg:'#fce7f3'},
@@ -374,18 +344,10 @@ const CATS = [
 ];
 const ICONS = ['✈️','🚗','🏙️','🤝','📊','🏕️','🔧','🎯','💼','🌎'];
 
-// ── STATE ────────────────────────────────────────────────────
-let currentUser   = null;  // {email, name, picture, token}
-let isAdmin       = false;
-let adminMode     = false; // admin is viewing all users
-let trips         = [];
-let activeTrip    = null;
-let activeExpenses= [];
-let selectedCat   = 'other';
-let receiptData   = null;
-let selectedIcon  = ICONS[0];
+let currentUser=null, isAdmin=false, adminMode=false;
+let trips=[], activeTrip=null, activeExpenses=[];
+let selectedCat='other', receiptData=null, selectedIcon=ICONS[0];
 
-// ── HELPERS ──────────────────────────────────────────────────
 const $ = id => document.getElementById(id);
 const money = n => '$' + (+n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
 const fmtDate = s => { const d=new Date(s+'T12:00:00'); return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
@@ -393,85 +355,59 @@ const catById = id => CATS.find(c=>c.id===id)||CATS[CATS.length-1];
 const uid = () => 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
 
 function showToast(msg, dur=3000) {
-  const t = $('toast'); t.textContent=msg; t.classList.add('vis');
+  const t=$('toast'); t.textContent=msg; t.classList.add('vis');
   setTimeout(()=>t.classList.remove('vis'), dur);
 }
 
-// Check if script URL has been configured
 function checkConfig() {
-  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-    $('configNotice').style.display = 'block';
-  } else {
-    $('configNotice').style.display = 'none';
-  }
+  $('configNotice').style.display = APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE' ? 'block' : 'none';
 }
 
-// ── GOOGLE SIGN-IN ───────────────────────────────────────────
 function handleGoogleSignIn(response) {
   const token = response.credential;
-  // Decode JWT payload (not for security — server verifies)
   const payload = JSON.parse(atob(token.split('.')[1]));
-  currentUser = {
-    email:   payload.email,
-    name:    payload.name || payload.email.split('@')[0],
-    picture: payload.picture || '',
-    token
-  };
+  currentUser = { email:payload.email, name:payload.name||payload.email.split('@')[0], picture:payload.picture||'', token };
   isAdmin = (currentUser.email === ADMIN_EMAIL);
-
-  // Update UI
-  $('loginScreen').style.display = 'none';
-  $('appShell').style.display = 'block';
+  $('loginScreen').style.display='none';
+  $('appShell').style.display='block';
   checkConfig();
-
-  const av = $('userAvatar');
-  if (currentUser.picture) {
-    av.innerHTML = `<img src="${currentUser.picture}" alt=""/>`;
-  } else {
-    av.textContent = currentUser.name[0].toUpperCase();
-  }
-  av.title = currentUser.name + ' (' + currentUser.email + ')';
-
-  if (isAdmin) {
-    $('adminBtn').style.display = '';
-  }
-
+  const av=$('userAvatar');
+  if(currentUser.picture) { av.innerHTML=`<img src="${currentUser.picture}" alt=""/>`; }
+  else { av.textContent=currentUser.name[0].toUpperCase(); }
+  av.title=currentUser.name+' ('+currentUser.email+')';
+  if(isAdmin) $('adminBtn').style.display='';
   loadTrips();
 }
 
-// ── API CALLS ─────────────────────────────────────────────────
 async function api(action, extra={}) {
-  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
-    throw new Error('Apps Script URL not configured. See setup instructions.');
-  }
-  const body = { action, token: currentUser.token, ...extra };
-  const res = await fetch(APPS_SCRIPT_URL, {
-    method:  'POST',
-    body:    JSON.stringify(body),
-    headers: { 'Content-Type': 'text/plain' }, // avoids CORS preflight
-  });
-  const data = await res.json();
-  if (!data.ok) throw new Error(data.error || 'API error');
+  if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL_HERE') throw new Error('Apps Script URL not configured.');
+  const body={action, token:currentUser.token, ...extra};
+  const res=await fetch(APPS_SCRIPT_URL,{method:'POST',body:JSON.stringify(body),headers:{'Content-Type':'text/plain'}});
+  const data=await res.json();
+  if(!data.ok) throw new Error(data.error||'API error');
   return data;
 }
 
-// ── TRIPS ─────────────────────────────────────────────────────
-async function loadTrips() {
-  $('tripsList').innerHTML = loadingHTML('Loading trips…');
-  try {
-    const params = {};
-    if (adminMode && $('adminUserFilter').value) {
-      params.filterEmail = $('adminUserFilter').value;
-    }
-    const res = await api('getTrips', params);
-    trips = res.trips || [];
-    renderTrips();
+// ── DUPLICATE NAME PROTECTION ──────────────────────────────
+function uniqueTripName(name) {
+  const existing = trips.filter(t => t.userEmail===currentUser.email).map(t => t.name.toLowerCase());
+  if(!existing.includes(name.toLowerCase())) return name;
+  let counter = 2;
+  while(existing.includes((name + ' ' + counter).toLowerCase())) counter++;
+  return name + ' ' + counter;
+}
 
-    if (isAdmin) {
-      loadAdminSummary();
-    }
+async function loadTrips() {
+  $('tripsList').innerHTML=loadingHTML('Loading trips…');
+  try {
+    const params={};
+    if(adminMode && $('adminUserFilter').value) params.filterEmail=$('adminUserFilter').value;
+    const res=await api('getTrips',params);
+    trips=res.trips||[];
+    renderTrips();
+    if(isAdmin) loadAdminSummary();
   } catch(e) {
-    $('tripsList').innerHTML = errorHTML(e.message);
+    $('tripsList').innerHTML=errorHTML(e.message);
   }
 }
 
@@ -483,37 +419,32 @@ function errorHTML(msg) {
 }
 
 async function loadAdminSummary() {
-  $('adminBar').style.display = '';
+  $('adminBar').style.display='';
   try {
-    const res = await api('getAdminSummary');
-    const s = res.summary;
-    $('adminBarSub').textContent = `${s.totalUsers} users · ${s.totalTrips} trips · ${money(s.grandTotal)} total`;
-
-    // Populate user filter
-    const sel = $('adminUserFilter');
-    const cur = sel.value;
-    sel.innerHTML = '<option value="">All Users</option>' +
-      (s.byUser||[]).map(u=>`<option value="${u.email}" ${u.email===cur?'selected':''}>${u.name} (${money(u.total)})</option>`).join('');
-  } catch(e) { /* silent */ }
+    const res=await api('getAdminSummary');
+    const s=res.summary;
+    $('adminBarSub').textContent=`${s.totalUsers} users · ${s.totalTrips} trips · ${money(s.grandTotal)} total`;
+    const sel=$('adminUserFilter'), cur=sel.value;
+    sel.innerHTML='<option value="">All Users</option>'+(s.byUser||[]).map(u=>`<option value="${u.email}" ${u.email===cur?'selected':''}>${u.name} (${money(u.total)})</option>`).join('');
+  } catch(e) {/* silent */}
 }
 
 function renderTrips() {
-  const heading = adminMode ? 'All Users — Trips' : 'My Trips';
-  $('tripsHeading').textContent = heading;
-
-  if (!trips.length) {
-    $('tripsList').innerHTML = `
+  const heading=adminMode?'All Users — Trips':'My Trips';
+  $('tripsHeading').textContent=heading;
+  if(!trips.length) {
+    $('tripsList').innerHTML=`
       <div class="empty-state">
         <div class="empty-emoji">🧳</div>
-        <div class="empty-title">${adminMode ? 'No trips found' : 'No trips yet'}</div>
-        <div class="empty-sub">${adminMode ? 'No expenses submitted yet.' : 'Create your first trip to start tracking.'}</div>
-        ${!adminMode ? '<button class="btn-primary" onclick="openNewTrip()">＋ Create Trip</button>' : ''}
+        <div class="empty-title">${adminMode?'No trips found':'No trips yet'}</div>
+        <div class="empty-sub">${adminMode?'No expenses submitted yet.':'Create your first trip to start tracking.'}</div>
+        ${!adminMode?'<button class="btn-primary" onclick="openNewTrip()">＋ Create Trip</button>':''}
       </div>`;
     return;
   }
-
-  $('tripsList').innerHTML = trips.map((t,i) => {
-    const showUser = adminMode || isAdmin;
+  $('tripsList').innerHTML=trips.map((t,i) => {
+    const showUser=adminMode||isAdmin;
+    const ownTrip=t.userEmail===currentUser.email;
     return `
     <div class="trip-card" style="animation-delay:${i*0.04}s" onclick="openTrip('${t.id}')">
       <div class="trip-icon">${t.icon||'✈️'}</div>
@@ -521,123 +452,166 @@ function renderTrips() {
         <div class="trip-name">${escHtml(t.name)}</div>
         <div class="trip-meta">
           ${fmtDate(t.created)}
-          ${showUser ? `<span class="trip-user-tag">👤 ${escHtml(t.userName)}</span>` : ''}
+          ${showUser?`<span class="trip-user-tag">👤 ${escHtml(t.userName)}</span>`:''}
         </div>
       </div>
       <div>
         <div class="trip-total">—</div>
         <div class="trip-count">tap to view</div>
       </div>
+      ${ownTrip?`<button class="trip-rename-btn" onclick="event.stopPropagation();openRenameTripFromList('${t.id}')">✏️</button>`:''}
       <div class="trip-arrow">›</div>
     </div>`;
   }).join('');
 }
 
-// ── ADMIN ─────────────────────────────────────────────────────
 function toggleAdminView() {
-  adminMode = !adminMode;
-  $('adminBar').style.display = adminMode ? '' : 'none';
-  $('adminBtn').textContent = adminMode ? '← My View' : '⚙ Admin';
+  adminMode=!adminMode;
+  $('adminBar').style.display=adminMode?'':'none';
+  $('adminBtn').textContent=adminMode?'← My View':'⚙ Admin';
   loadTrips();
 }
+function onAdminFilterChange() { loadTrips(); }
 
-function onAdminFilterChange() {
-  loadTrips();
-}
-
-// ── NEW TRIP ──────────────────────────────────────────────────
 function openNewTrip() {
-  selectedIcon = ICONS[0];
-  $('newTripName').value = '';
-  $('iconPicker').innerHTML = ICONS.map(ic =>
-    `<button class="icon-btn${ic===selectedIcon?' sel':''}" onclick="pickIcon('${ic}',this)">${ic}</button>`
-  ).join('');
+  selectedIcon=ICONS[0];
+  $('newTripName').value='';
+  $('iconPicker').innerHTML=ICONS.map(ic=>`<button class="icon-btn${ic===selectedIcon?' sel':''}" onclick="pickIcon('${ic}',this)">${ic}</button>`).join('');
   $('tripModal').classList.add('open');
   setTimeout(()=>$('newTripName').focus(),120);
 }
 function closeTripModal() { $('tripModal').classList.remove('open'); }
-function pickIcon(ic, btn) {
-  selectedIcon = ic;
+function pickIcon(ic,btn) {
+  selectedIcon=ic;
   $('iconPicker').querySelectorAll('.icon-btn').forEach(b=>b.classList.remove('sel'));
   btn.classList.add('sel');
 }
 
 async function createTrip() {
-  const name = $('newTripName').value.trim();
-  if (!name) { $('newTripName').focus(); return; }
-  const btn = $('createTripBtn');
-  btn.disabled = true; btn.textContent = 'Creating…';
+  let name=$('newTripName').value.trim();
+  if(!name) { $('newTripName').focus(); return; }
+  name=uniqueTripName(name);
+  const btn=$('createTripBtn');
+  btn.disabled=true; btn.textContent='Creating…';
   try {
-    const trip = { id: uid(), name, icon: selectedIcon, created: new Date().toISOString().split('T')[0], userEmail: currentUser.email, userName: currentUser.name, archived: false };
-    await api('saveTrip', { trip });
+    const trip={id:uid(),name,icon:selectedIcon,created:new Date().toISOString().split('T')[0],userEmail:currentUser.email,userName:currentUser.name,archived:false};
+    await api('saveTrip',{trip});
     closeTripModal();
     await loadTrips();
     openTrip(trip.id);
   } catch(e) {
-    showToast('Error: ' + e.message);
+    showToast('Error: '+e.message);
   } finally {
     btn.disabled=false; btn.textContent='Create';
   }
 }
 
-// ── DETAIL ────────────────────────────────────────────────────
-async function openTrip(id) {
-  activeTrip = trips.find(t=>t.id===id);
-  if (!activeTrip) return;
+// ── RENAME TRIP ────────────────────────────────────────────
+let renamingTripId = null;
 
+function openRenameModal() {
+  if(!activeTrip) return;
+  renamingTripId = activeTrip.id;
+  $('renameTripInput').value = activeTrip.name;
+  $('renameModal').classList.add('open');
+  setTimeout(()=>$('renameTripInput').focus(),120);
+}
+
+function openRenameTripFromList(id) {
+  const trip = trips.find(t=>t.id===id);
+  if(!trip) return;
+  renamingTripId = id;
+  $('renameTripInput').value = trip.name;
+  $('renameModal').classList.add('open');
+  setTimeout(()=>$('renameTripInput').focus(),120);
+}
+
+function closeRenameModal() {
+  $('renameModal').classList.remove('open');
+  renamingTripId = null;
+}
+
+async function confirmRename() {
+  let newName = $('renameTripInput').value.trim();
+  if(!newName || !renamingTripId) return;
+  const trip = trips.find(t=>t.id===renamingTripId);
+  if(!trip) return;
+  // Check duplicates excluding current trip
+  const existing = trips.filter(t=>t.userEmail===currentUser.email && t.id!==renamingTripId).map(t=>t.name.toLowerCase());
+  if(existing.includes(newName.toLowerCase())) {
+    let counter=2;
+    while(existing.includes((newName+' '+counter).toLowerCase())) counter++;
+    newName = newName + ' ' + counter;
+  }
+  const btn=$('renameTripBtn');
+  btn.disabled=true; btn.textContent='Saving…';
+  try {
+    const updated = {...trip, name:newName};
+    await api('saveTrip',{trip:updated});
+    trip.name = newName;
+    if(activeTrip && activeTrip.id===renamingTripId) {
+      activeTrip.name = newName;
+      $('detailTitle').textContent = newName;
+    }
+    renderTrips();
+    closeRenameModal();
+    showToast('Trip renamed ✓');
+  } catch(e) {
+    showToast('Error: '+e.message);
+  } finally {
+    btn.disabled=false; btn.textContent='Save';
+  }
+}
+
+async function openTrip(id) {
+  activeTrip=trips.find(t=>t.id===id);
+  if(!activeTrip) return;
   $('viewTrips').classList.remove('active');
   $('viewDetail').classList.add('active');
-  $('detailTitle').textContent = activeTrip.name;
-  $('expRows').innerHTML = loadingHTML('Loading expenses…');
+  $('detailTitle').textContent=activeTrip.name;
+  $('expRows').innerHTML=loadingHTML('Loading expenses…');
   $('sumTotal').textContent='—';$('sumMiles').textContent='—';$('sumRec').textContent='—';
-
-  // Hide add panel if admin viewing someone else's trip
-  const ownTrip = activeTrip.userEmail === currentUser.email;
-  $('addPanelWrap').style.display = ownTrip ? '' : 'none';
-
-  // Reset form
-  $('fDate').value = new Date().toISOString().split('T')[0];
+  const ownTrip=activeTrip.userEmail===currentUser.email;
+  $('addPanelWrap').style.display=ownTrip?'':'none';
+  $('renameBtn').style.display=ownTrip?'':'none';
+  $('fDate').value=new Date().toISOString().split('T')[0];
   selectedCat='other'; buildChips(); clearReceipt();
   $('miTog').checked=false; $('miFields').classList.remove('open'); $('amtRow').style.display='';
-
   try {
-    const res = await api('getExpenses', { tripId: id });
-    activeExpenses = res.expenses || [];
+    const res=await api('getExpenses',{tripId:id});
+    activeExpenses=res.expenses||[];
     renderDetail();
   } catch(e) {
-    $('expRows').innerHTML = errorHTML(e.message);
+    $('expRows').innerHTML=errorHTML(e.message);
   }
 }
 
 function goBack() {
   $('viewDetail').classList.remove('active');
   $('viewTrips').classList.add('active');
-  closeAdd();
-  activeTrip=null; activeExpenses=[];
+  closeAdd(); activeTrip=null; activeExpenses=[];
 }
 
 function renderDetail() {
-  const items = activeExpenses;
-  const cash  = items.filter(e=>e.cat!=='mileage').reduce((s,e)=>s+(+e.amt||0),0);
-  const miCost= items.filter(e=>e.cat==='mileage').reduce((s,e)=>s+(+e.amt||0),0);
-  const miles = items.filter(e=>e.cat==='mileage').reduce((s,e)=>s+(+e.miles||0),0);
-  const recs  = items.filter(e=>e.hasReceipt==='true'||e.hasReceipt===true).length;
-
-  $('sumTotal').textContent  = money(cash+miCost);
-  $('sumCount').textContent  = `${items.length} expense${items.length!==1?'s':''}`;
-  $('sumMiles').textContent  = miles.toFixed(1)+' mi';
-  $('sumMiCost').textContent = money(miCost)+' reimbursable';
-  $('sumRec').textContent    = recs;
-
-  if (!items.length) {
-    $('expRows').innerHTML = '<div class="empty-list">No expenses yet — add your first one above</div>';
+  const items=activeExpenses;
+  const cash=items.filter(e=>e.cat!=='mileage').reduce((s,e)=>s+(+e.amt||0),0);
+  const miCost=items.filter(e=>e.cat==='mileage').reduce((s,e)=>s+(+e.amt||0),0);
+  const miles=items.filter(e=>e.cat==='mileage').reduce((s,e)=>s+(+e.miles||0),0);
+  const recs=items.filter(e=>e.hasReceipt==='true'||e.hasReceipt===true).length;
+  $('sumTotal').textContent=money(cash+miCost);
+  $('sumCount').textContent=`${items.length} expense${items.length!==1?'s':''}`;
+  $('sumMiles').textContent=miles.toFixed(1)+' mi';
+  $('sumMiCost').textContent=money(miCost)+' reimbursable';
+  $('sumRec').textContent=recs;
+  if(!items.length) {
+    $('expRows').innerHTML='<div class="empty-list">No expenses yet — add your first one above</div>';
     return;
   }
-  $('expRows').innerHTML = items.map((e,i)=>{
-    const cat = catById(e.cat);
-    const sub = [e.vendor, e.miles?(+e.miles).toFixed(1)+' mi':null, e.notes].filter(Boolean).join(' · ');
-    const hasRec = e.hasReceipt==='true'||e.hasReceipt===true;
-    const ownExp = e.userEmail===currentUser.email;
+  $('expRows').innerHTML=items.map((e,i)=>{
+    const cat=catById(e.cat);
+    const sub=[e.vendor,e.miles?(+e.miles).toFixed(1)+' mi':null,e.notes].filter(Boolean).join(' · ');
+    const hasRec=e.hasReceipt==='true'||e.hasReceipt===true;
+    const ownExp=e.userEmail===currentUser.email;
     return `
     <div class="exp-row" style="animation-delay:${i*0.03}s">
       <div class="exp-cat" style="background:${cat.bg}">${cat.icon}</div>
@@ -655,7 +629,6 @@ function renderDetail() {
   }).join('');
 }
 
-// ── ADD PANEL ─────────────────────────────────────────────────
 function toggleAdd() {
   const form=$('addForm'),head=$('addHead'),tog=$('addToggle');
   const open=form.classList.toggle('open');
@@ -685,9 +658,7 @@ function onMiTog() {
 }
 function onReceipt(e) {
   const file=e.target.files[0]; if(!file)return;
-  // Resize to max 800px to save sheet storage
-  const img=new Image();
-  const reader=new FileReader();
+  const img=new Image(), reader=new FileReader();
   reader.onload=ev=>{
     img.onload=()=>{
       const max=800,canvas=document.createElement('canvas');
@@ -711,7 +682,7 @@ async function saveExpense() {
   const isMi=$('miTog').checked;
   let amt=0,miles=0;
   if(isMi){
-    const s=parseFloat($('fOdoS').value),en=parseFloat($('fOdoE').value),r=parseFloat($('fRate').value)||0.70;
+    const s=parseFloat($('fOdoS').value),en=parseFloat($('fOdoE').value),r=parseFloat($('fRate').value)||0.725;
     if(isNaN(s)||isNaN(en)||en<=s){showToast('Check odometer readings.');return;}
     miles=en-s; amt=miles*r;
   } else {
@@ -721,21 +692,16 @@ async function saveExpense() {
   const btn=$('saveBtn'); btn.disabled=true; btn.textContent='Saving…';
   try {
     const expense={
-      id:uid(), userEmail:currentUser.email, userName:currentUser.name,
-      tripId:activeTrip.id, desc, date, cat:selectedCat,
-      amt:parseFloat(amt.toFixed(2)), miles:parseFloat(miles.toFixed(1)),
-      vendor:$('fVendor').value.trim(), notes:$('fNotes').value.trim(),
-      hasReceipt: receiptData ? 'true' : 'false',
-      createdAt: new Date().toISOString()
+      id:uid(),userEmail:currentUser.email,userName:currentUser.name,
+      tripId:activeTrip.id,desc,date,cat:selectedCat,
+      amt:parseFloat(amt.toFixed(2)),miles:parseFloat(miles.toFixed(1)),
+      vendor:$('fVendor').value.trim(),notes:$('fNotes').value.trim(),
+      hasReceipt:receiptData?'true':'false',
+      createdAt:new Date().toISOString()
     };
-    // Save receipt separately if present (to avoid row size limits)
-    // For simplicity we include it inline — for large deployments consider Google Drive
-    if (receiptData) expense.receipt = receiptData;
-
-    await api('saveExpense', { expense });
+    if(receiptData) expense.receipt=receiptData;
+    await api('saveExpense',{expense});
     activeExpenses.unshift(expense);
-
-    // Reset form
     $('fDesc').value='';$('fAmt').value='';$('fVendor').value='';$('fNotes').value='';
     $('fOdoS').value='';$('fOdoE').value='';
     $('miTog').checked=false;$('miFields').classList.remove('open');$('amtRow').style.display='';
@@ -759,21 +725,14 @@ async function deleteExpense(id) {
   } catch(e){showToast('Error: '+e.message);}
 }
 
-// ── RECEIPT VIEWER ────────────────────────────────────────────
 function viewReceipt(expId) {
-  const exp = activeExpenses.find(e=>e.id===expId);
-  // Receipt data may be stored in the expense object or need a separate fetch
-  if (exp && exp.receipt) {
-    $('lbImg').src = exp.receipt;
-    $('lightbox').classList.add('open');
-  } else {
-    showToast('Receipt image not loaded — reload the trip to view attachments.');
-  }
+  const exp=activeExpenses.find(e=>e.id===expId);
+  if(exp&&exp.receipt){ $('lbImg').src=exp.receipt; $('lightbox').classList.add('open'); }
+  else { showToast('Receipt image not loaded — reload the trip to view attachments.'); }
 }
 function closeLightbox(){$('lightbox').classList.remove('open');}
 
-// ── EXPORT ────────────────────────────────────────────────────
-function buildCSV(tripObj, expenses) {
+function buildCSV(tripObj,expenses) {
   const header=['Date','Description','Category','Amount','Miles','Vendor','Notes','Receipt'];
   const rows=expenses.map(e=>{
     const cat=catById(e.cat);
@@ -790,7 +749,7 @@ function dl(filename,content){
 }
 function exportTripCSV(){
   if(!activeTrip||!activeExpenses.length){showToast('No expenses to export.');return;}
-  dl(`${activeTrip.name.replace(/\s+/g,'-')}.csv`, buildCSV(activeTrip,activeExpenses));
+  dl(`${activeTrip.name.replace(/\s+/g,'-')}.csv`,buildCSV(activeTrip,activeExpenses));
 }
 async function exportAllCSV() {
   showToast('Preparing export…');
@@ -805,7 +764,6 @@ async function exportAllCSV() {
   } catch(e){showToast('Export error: '+e.message);}
 }
 
-// ── UTILS ────────────────────────────────────────────────────
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
 </body>
