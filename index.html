@@ -3,14 +3,14 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Xpense</title>
-<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Syne:wght@700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&family=Syne:wght@700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 :root {
   --ink:#111010;--ink2:#4a4845;--ink3:#9b9793;--paper:#faf9f7;--card:#fff;--rule:#ebebea;
   --amber:#d97706;--amber-bg:#fffbf0;--green:#166534;--green-bg:#f0fdf4;
   --red:#b91c1c;--red-bg:#fef2f2;--blue:#1d4ed8;--blue-bg:#eff6ff;
-  --sans:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'Inter',system-ui,sans-serif;--r:12px;
+  --sans:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'Space Grotesk',system-ui,sans-serif;--r:12px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
@@ -185,6 +185,11 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .comment-del{background:none;border:none;cursor:pointer;color:var(--ink3);font-size:12px;padding:2px 4px;border-radius:4px;opacity:0;transition:opacity 0.15s,color 0.15s;flex-shrink:0;}
 .comment-item:hover .comment-del{opacity:1;}
 .comment-del:hover{color:var(--red);}
+
+.pd-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;background:var(--blue-bg);border-radius:8px;padding:10px 12px;}
+.pd-row .field{flex:1;}
+.pd-rate-note{font-size:11px;color:var(--blue);margin-left:4px;}
+
 .comment-input-row{padding:12px 16px;border-top:1px solid var(--rule);display:flex;gap:8px;align-items:flex-end;}
 .comment-input{flex:1;padding:8px 11px;border:1px solid var(--rule);border-radius:8px;font-family:var(--sans);font-size:13px;color:var(--ink);background:var(--paper);outline:none;resize:none;transition:border-color 0.15s;min-height:36px;max-height:100px;}
 .comment-input:focus{border-color:var(--ink);}
@@ -310,6 +315,10 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
             <label class="tog-wrap"><input type="checkbox" id="miTog" onchange="onMiTog()"><span class="tog-slider"></span></label>
             <span class="mi-label">This is a mileage expense</span>
           </div>
+          <div class="pd-row" id="pdRow" style="display:none;">
+            <div class="field"><label>Days</label><input type="number" id="fDays" placeholder="1" min="1" step="1" oninput="onDaysChange()"></div>
+            <span class="pd-rate-note">× $<span id="pdRateDisplay">60</span>/day</span>
+          </div>
           <div class="mf" id="miFields">
             <div class="field"><label>Start Odo</label><input type="number" id="fOdoS" placeholder="45200"></div>
             <div class="field"><label>End Odo</label><input type="number" id="fOdoE" placeholder="45258"></div>
@@ -390,10 +399,12 @@ const CATS = [
   {id:'mileage', label:'Mileage', icon:'🚗',  bg:'#fff7ed'},
   {id:'supplies',label:'Supplies',icon:'📦',  bg:'#dcfce7'},
   {id:'parking', label:'Parking', icon:'🅿️', bg:'#e0f2fe'},
+  {id:'perdiem', label:'Per Diem', icon:'📅',  bg:'#fdf4ff'},
   {id:'other',   label:'Other',   icon:'📋',  bg:'#f3f4f6'},
 ];
 const ICONS = ['✈️','🚗','🏙️','🤝','📊','🏕️','🔧','🎯','💼','🌎'];
 
+const PERDIEM_RATE = 60;
 let currentUser=null, isAdmin=false, adminMode=false;
 let trips=[], activeTrip=null, activeExpenses=[];
 let selectedCat='other', receiptData=null, selectedIcon=ICONS[0];
@@ -629,7 +640,7 @@ async function openTrip(id) {
   const _ic=activeTrip.closed===true||activeTrip.closed==='true'; const _cb=$('closeBtn'); if(_cb){if(ownTrip){_cb.style.display='';_cb.textContent=_ic?'🔓 Reopen':'🔒 Close';_cb.className='detail-close'+(_ic?' reopen':'');}else{_cb.style.display='none';}}
   $('fDate').value=new Date().toISOString().split('T')[0];
   selectedCat='other'; buildChips(); clearReceipt();
-  $('miTog').checked=false; $('miFields').classList.remove('open'); $('amtRow').style.display='';
+  $('miTog').checked=false; $('miFields').classList.remove('open'); $('amtRow').style.display=''; $('pdRow').style.display='none'; $('fDays').value='';
   // Load comments from trip object
   activeComments = Array.isArray(activeTrip.comments) ? activeTrip.comments : [];
   renderComments();
@@ -659,7 +670,7 @@ function renderDetail() {
   const recs=items.filter(e=>e.hasReceipt==='true'||e.hasReceipt===true).length;
   $('sumTotal').textContent=money(cash+miCost);
   $('sumCount').textContent=`${items.length} expense${items.length!==1?'s':''}`;
-  $('sumMiles').textContent=miles.toFixed(1)+' mi';
+  $('sumMiles').textContent=Math.round(miles)+' mi';
   $('sumMiCost').textContent=money(miCost)+' reimbursable';
   $('sumRec').textContent=recs;
   if(!items.length) {
@@ -668,7 +679,7 @@ function renderDetail() {
   }
   $('expRows').innerHTML=items.map((e,i)=>{
     const cat=catById(e.cat);
-    const sub=[e.vendor,e.miles?(+e.miles).toFixed(1)+' mi':null,e.notes].filter(Boolean).join(' · ');
+    const sub=[e.vendor,e.miles?Math.round(+e.miles)+' mi':null,e.notes].filter(Boolean).join(' · ');
     const hasRec=e.hasReceipt==='true'||e.hasReceipt===true;
     const ownExp=e.userEmail===currentUser.email;
     return `
@@ -708,12 +719,32 @@ function pickCat(id,btn) {
   btn.classList.add('on');
   if(id==='mileage'){$('miTog').checked=true;onMiTog();}
   else{$('miTog').checked=false;onMiTog();}
+  updatePerDiemUI();
 }
 function onMiTog() {
   const on=$('miTog').checked;
   $('miFields').classList.toggle('open',on);
   $('amtRow').style.display=on?'none':'';
   if(on&&selectedCat!=='mileage'){selectedCat='mileage';buildChips();}
+  updatePerDiemUI();
+}
+function updatePerDiemUI() {
+  const isPD = selectedCat==='perdiem';
+  $('pdRow').style.display = isPD ? '' : 'none';
+  if(isPD) {
+    $('amtRow').style.display='none';
+    $('miTog').checked=false;
+    $('miFields').classList.remove('open');
+    $('pdRateDisplay').textContent=PERDIEM_RATE;
+    onDaysChange();
+    setTimeout(()=>$('fDays').focus(),80);
+  } else if(!$('miTog').checked) {
+    $('amtRow').style.display='';
+  }
+}
+function onDaysChange() {
+  const days = parseFloat($('fDays').value)||0;
+  if(days>0) $('fAmt').value=(days*PERDIEM_RATE).toFixed(2);
 }
 function onReceipt(e) {
   const file=e.target.files[0]; if(!file)return;
@@ -750,20 +781,24 @@ async function saveExpense() {
   }
   const btn=$('saveBtn'); btn.disabled=true; btn.textContent='Saving…';
   try {
+    const isPD = selectedCat==='perdiem';
+    const days = isPD ? (parseFloat($('fDays').value)||0) : 0;
     const expense={
       id:uid(),userEmail:currentUser.email,userName:currentUser.name,
       tripId:activeTrip.id,desc,date,cat:selectedCat,
       amt:parseFloat(amt.toFixed(2)),miles:parseFloat(miles.toFixed(1)),
-      vendor:$('fVendor').value.trim(),notes:$('fNotes').value.trim(),
+      vendor:$('fVendor').value.trim(),
+      notes: isPD && days ? `${days} day${days!==1?'s':''} × $${PERDIEM_RATE}/day${$('fNotes').value.trim()?'  '+$('fNotes').value.trim():''}` : $('fNotes').value.trim(),
       hasReceipt:receiptData?'true':'false',
       createdAt:new Date().toISOString()
     };
     if(receiptData) expense.receipt=receiptData;
     await api('saveExpense',{expense});
     activeExpenses.unshift(expense);
-    $('fDesc').value='';$('fAmt').value='';$('fVendor').value='';$('fNotes').value='';
+    $('fDesc').value='';$('fAmt').value='';$('fVendor').value='';$('fNotes').value='';$('fDays').value='';
     $('fOdoS').value='';$('fOdoE').value='';
     $('miTog').checked=false;$('miFields').classList.remove('open');$('amtRow').style.display='';
+    $('pdRow').style.display='none';
     selectedCat='other'; buildChips(); clearReceipt(); closeAdd();
     renderDetail();
     showToast('Expense saved ✓');
