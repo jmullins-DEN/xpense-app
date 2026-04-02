@@ -698,7 +698,7 @@ async function openTrip(id) {
   $('viewDetail').classList.add('active');
   $('detailTitle').textContent=activeTrip.name;
   $('expRows').innerHTML=loadingHTML('Loading expenses…');
-  $('sumTotal').textContent='—';$('sumMiles').textContent='—';$('sumRec').textContent='—';
+  $('sumTotal').textContent='—';$('sumReimburse').textContent='—';$('sumRec').textContent='—';
   const ownTrip=activeTrip.userEmail===currentUser.email;
   const _b=activeTrip.billing||''; const _bb=$('billingNoteBar'); if(_bb){_bb.style.display=_b?'':'none'; if(_b)$('billingNoteText').textContent=_b;}
   $('addPanelWrap').style.display=ownTrip?'':'none';
@@ -741,8 +741,7 @@ function renderDetail() {
   $('sumCount').textContent=`${items.length} expense${items.length!==1?'s':''}`;
   $('sumReimburse').textContent=money(reimburse);
   $('sumReimburseNote').textContent=nonReimburse>0?`${money(nonReimburse)} non-reimb.`:'all reimbursable';
-  $('sumMiles').textContent=Math.round(miles)+' mi';
-  $('sumMiCost').textContent=money(miCost)+' mileage';
+  // mileage shown per-row only
   $('sumRec').textContent=recs;
   if(!items.length) {
     $('expRows').innerHTML='<div class="empty-list">No expenses yet — add your first one above</div>';
