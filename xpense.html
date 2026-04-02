@@ -222,7 +222,14 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   .view{display:none!important;}
   #viewDetail{display:block!important;}
   .comments-panel{margin-top:16px;}
+  .receipt-print-section{display:block!important;}
+  .receipt-print-page{page-break-before:always;}
+  .receipt-print-img{max-width:100%;max-height:85vh;object-fit:contain;display:block;margin:0 auto;}
 }
+.receipt-print-section{display:none;}
+.receipt-print-page{padding:16px;}
+.receipt-print-title{font-family:var(--display);font-size:12px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:8px;}
+.receipt-print-img{max-width:100%;border-radius:6px;}
 .print-header{display:none;padding:0 0 14px 0;border-bottom:2px solid var(--ink);margin-bottom:18px;}
 .print-header-logo{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.03em;margin-bottom:2px;}
 .print-header-logo span{color:var(--amber);}
@@ -327,7 +334,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
         </div>
         <div class="add-form" id="addForm">
           <div class="fg" id="descRow">
-            <div class="field"><label>Destination</label><input type="text" id="fDesc" placeholder="e.g. San Antonio"></div>
+            <div class="field"><label id="descLabel">Destination</label><input type="text" id="fDesc" placeholder="e.g. San Antonio"></div>
             <div class="field"><label>Date</label><input type="date" id="fDate"></div>
           </div>
           <div class="field" style="margin-bottom:10px;"><label>Category</label><div class="chip-row" id="chipRow"></div></div>
@@ -365,6 +372,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
         </div>
       </div>
       <div class="exp-list-card"><div id="expRows"></div></div>
+      <div class="receipt-print-section" id="receiptPrintSection"></div>
     </div>
   </main>
 </div>
@@ -816,6 +824,12 @@ function pickCat(id,btn) {
   $('pdRow').style.display = isPD ? '' : 'none';
   // hide description row for per diem
   $('descRow').style.display = isPD ? 'none' : '';
+  // update label: flight & mileage = Destination (required), others = Location (optional)
+  const needsDest = id==='travel' || id==='mileage';
+  const lbl = $('descLabel');
+  const inp = $('fDesc');
+  if(lbl) lbl.textContent = needsDest ? 'Destination *' : 'Location';
+  if(inp) inp.placeholder = needsDest ? 'e.g. San Antonio' : 'e.g. Marriott Downtown (optional)';
   if(isPD) {
     $('amtRow').style.display='none';
     $('pdRateDisplay').textContent=PERDIEM_RATE;
@@ -855,9 +869,10 @@ function clearReceipt(){receiptData=null;$('fReceipt').value='';$('rPrev').class
 
 async function saveExpense() {
   const isPD = selectedCat==='perdiem';
-  const desc = isPD ? 'Per Diem' : $('fDesc').value.trim();
+  const needsDest = selectedCat==='travel' || selectedCat==='mileage';
+  const desc = isPD ? 'Per Diem' : ($('fDesc').value.trim() || '');
   const date=$('fDate').value;
-  if(!isPD && !desc){showToast('Please enter a description.');return;}
+  if(needsDest && !desc){showToast('Please enter a destination.');return;}
   if(!date){showToast('Please select a date.');return;}
   const isMi=selectedCat==='mileage';
   let amt=0,miles=0;
@@ -1056,7 +1071,26 @@ function printTripPDF() {
   const expCount = $('sumCount').textContent;
   const printed = new Date().toLocaleDateString('en-US', {month:'long',day:'numeric',year:'numeric'});
   sub.textContent = `${activeTrip.name}  ·  ${total}  ·  ${expCount}  ·  Printed ${printed}`;
+
+  // Build receipt pages
+  const section = $('receiptPrintSection');
+  const withReceipts = activeExpenses.filter(e => (e.hasReceipt==='true'||e.hasReceipt===true) && e.receipt);
+  if (withReceipts.length) {
+    section.innerHTML = withReceipts.map((e, i) => {
+      const cat = catById(e.cat);
+      return `<div class="receipt-print-page">
+        <div class="receipt-print-title">${escHtml(e.desc||'Receipt')} — ${fmtDate(e.date)} — ${money(e.amt)}</div>
+        <img class="receipt-print-img" src="${e.receipt}" alt="Receipt ${i+1}">
+      </div>`;
+    }).join('');
+  } else {
+    section.innerHTML = '';
+  }
+
   window.print();
+
+  // Clean up after print dialog closes
+  setTimeout(() => { section.innerHTML = ''; }, 1000);
 }
 </script>
 
