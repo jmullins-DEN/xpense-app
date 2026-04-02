@@ -86,8 +86,8 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .detail-close:hover{border-color:var(--red);color:var(--red);}
 .detail-close.reopen{color:var(--green);}
 .detail-close.reopen:hover{border-color:var(--green);}
-.summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
-@media(max-width:480px){.summary-strip{grid-template-columns:1fr 1fr;}}
+.summary-strip{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:18px;}
+/* summary always 2-col */
 .sum-card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;}
 .sum-label{font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
 .sum-value{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
@@ -302,7 +302,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
       </div>
       <div class="summary-strip">
         <div class="sum-card"><div class="sum-label">Total</div><div class="sum-value amber" id="sumTotal">—</div><div class="sum-sub" id="sumCount"></div></div>
-        <div class="sum-card"><div class="sum-label">Mileage</div><div class="sum-value" id="sumMiles">—</div><div class="sum-sub" id="sumMiCost"></div></div>
+        <div class="sum-card"><div class="sum-label">Reimbursable</div><div class="sum-value" style="color:var(--green)" id="sumReimburse">—</div><div class="sum-sub" id="sumReimburseNote"></div></div>
         <div class="sum-card"><div class="sum-label">Receipts</div><div class="sum-value" id="sumRec">—</div><div class="sum-sub">attached</div></div>
       </div>
       <div class="billing-note" id="billingNoteBar" style="display:none;"><div class="billing-note-icon">🧾</div><div class="billing-note-text" id="billingNoteText"></div></div>
@@ -325,7 +325,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
           <button class="add-toggle" id="addToggle">+</button>
         </div>
         <div class="add-form" id="addForm">
-          <div class="fg">
+          <div class="fg" id="descRow">
             <div class="field"><label>Description</label><input type="text" id="fDesc" placeholder="e.g. Gas station"></div>
             <div class="field"><label>Date</label><input type="date" id="fDate"></div>
           </div>
@@ -452,12 +452,12 @@ const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/synergy-solutionsllc
 const ADMIN_EMAIL     = 'jmullins@synergy-solutionsllc.com';
 
 const CATS = [
-  {id:'meals',   label:'Meals',   icon:'🍽️', bg:'#fce7f3'},
+  {id:'meals',   label:'Meals',   icon:'🍽️', bg:'#fce7f3', noReimburse:true},
   {id:'travel',  label:'Flight',  icon:'✈️',  bg:'#dbeafe'},
   {id:'lodging', label:'Lodging', icon:'🏨',  bg:'#ede9fe'},
   {id:'fuel',    label:'Fuel',    icon:'⛽',  bg:'#fef3c7'},
   {id:'mileage', label:'Mileage', icon:'🚗',  bg:'#fff7ed'},
-  {id:'supplies',label:'Supplies',icon:'📦',  bg:'#dcfce7'},
+  {id:'supplies',label:'Rental Car',icon:'🚙',  bg:'#dcfce7'},
   {id:'parking', label:'Parking', icon:'🅿️', bg:'#e0f2fe'},
   {id:'perdiem', label:'Per Diem', icon:'📅',  bg:'#fdf4ff'},
   {id:'other',   label:'Other',   icon:'📋',  bg:'#f3f4f6'},
@@ -706,7 +706,7 @@ async function openTrip(id) {
   const _ic=activeTrip.closed===true||activeTrip.closed==='true'; const _cb=$('closeBtn'); if(_cb){if(ownTrip){_cb.style.display='';_cb.textContent=_ic?'🔓 Reopen':'🔒 Close';_cb.className='detail-close'+(_ic?' reopen':'');}else{_cb.style.display='none';}}
   $('fDate').value=new Date().toISOString().split('T')[0];
   selectedCat='other'; buildChips(); clearReceipt();
-  $('miFields').classList.remove('open');$('amtRow').style.display=''; $('pdRow').style.display='none'; $('fDays').value='';
+  $('miFields').classList.remove('open');$('amtRow').style.display=''; $('pdRow').style.display='none'; $('fDays').value=''; $('descRow').style.display='';
   // Load comments from trip object
   activeComments = Array.isArray(activeTrip.comments) ? activeTrip.comments : [];
   renderComments();
@@ -730,14 +730,19 @@ function goBack() {
 
 function renderDetail() {
   const items=activeExpenses;
-  const cash=items.filter(e=>e.cat!=='mileage').reduce((s,e)=>s+(+e.amt||0),0);
+  const NON_REIMBURSE = CATS.filter(c=>c.noReimburse).map(c=>c.id);
+  const total=items.reduce((s,e)=>s+(+e.amt||0),0);
   const miCost=items.filter(e=>e.cat==='mileage').reduce((s,e)=>s+(+e.amt||0),0);
   const miles=items.filter(e=>e.cat==='mileage').reduce((s,e)=>s+(+e.miles||0),0);
+  const reimburse=items.filter(e=>!NON_REIMBURSE.includes(e.cat)).reduce((s,e)=>s+(+e.amt||0),0);
+  const nonReimburse=items.filter(e=>NON_REIMBURSE.includes(e.cat)).reduce((s,e)=>s+(+e.amt||0),0);
   const recs=items.filter(e=>e.hasReceipt==='true'||e.hasReceipt===true).length;
-  $('sumTotal').textContent=money(cash+miCost);
+  $('sumTotal').textContent=money(total);
   $('sumCount').textContent=`${items.length} expense${items.length!==1?'s':''}`;
+  $('sumReimburse').textContent=money(reimburse);
+  $('sumReimburseNote').textContent=nonReimburse>0?`${money(nonReimburse)} non-reimb.`:'all reimbursable';
   $('sumMiles').textContent=Math.round(miles)+' mi';
-  $('sumMiCost').textContent=money(miCost)+' reimbursable';
+  $('sumMiCost').textContent=money(miCost)+' mileage';
   $('sumRec').textContent=recs;
   if(!items.length) {
     $('expRows').innerHTML='<div class="empty-list">No expenses yet — add your first one above</div>';
@@ -789,6 +794,8 @@ function pickCat(id,btn) {
   // per diem fields
   const isPD = id==='perdiem';
   $('pdRow').style.display = isPD ? '' : 'none';
+  // hide description row for per diem
+  $('descRow').style.display = isPD ? 'none' : '';
   if(isPD) {
     $('amtRow').style.display='none';
     $('pdRateDisplay').textContent=PERDIEM_RATE;
@@ -799,6 +806,7 @@ function pickCat(id,btn) {
     setTimeout(()=>$('fOdoS').focus(),80);
   } else {
     $('amtRow').style.display='';
+    setTimeout(()=>$('fDesc').focus(),80);
   }
 }
 function onDaysChange() {
@@ -826,8 +834,11 @@ function onReceipt(e) {
 function clearReceipt(){receiptData=null;$('fReceipt').value='';$('rPrev').classList.remove('vis');$('rArea').style.display='';}
 
 async function saveExpense() {
-  const desc=$('fDesc').value.trim(), date=$('fDate').value;
-  if(!desc||!date){showToast('Please enter a description and date.');return;}
+  const isPD = selectedCat==='perdiem';
+  const desc = isPD ? 'Per Diem' : $('fDesc').value.trim();
+  const date=$('fDate').value;
+  if(!isPD && !desc){showToast('Please enter a description.');return;}
+  if(!date){showToast('Please select a date.');return;}
   const isMi=selectedCat==='mileage';
   let amt=0,miles=0;
   if(isMi){
@@ -856,8 +867,8 @@ async function saveExpense() {
     activeExpenses.unshift(expense);
     $('fDesc').value='';$('fAmt').value='';$('fVendor').value='';$('fNotes').value='';$('fDays').value='';
     $('fOdoS').value='';$('fOdoE').value='';
-    $('miTog').checked=false;$('miFields').classList.remove('open');$('amtRow').style.display='';
-    $('pdRow').style.display='none';
+    $('miFields').classList.remove('open');$('amtRow').style.display='';
+    $('pdRow').style.display='none'; $('descRow').style.display='';
     selectedCat='other'; buildChips(); clearReceipt(); closeAdd();
     renderDetail();
     showToast('Expense saved ✓');
