@@ -304,6 +304,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
         <div class="sum-card"><div class="sum-label">Total</div><div class="sum-value amber" id="sumTotal">—</div><div class="sum-sub" id="sumCount"></div></div>
         <div class="sum-card"><div class="sum-label">Reimbursable</div><div class="sum-value" style="color:var(--green)" id="sumReimburse">—</div><div class="sum-sub" id="sumReimburseNote"></div></div>
         <div class="sum-card"><div class="sum-label">Receipts</div><div class="sum-value" id="sumRec">—</div><div class="sum-sub">attached</div></div>
+        <div class="sum-card"><div class="sum-label">Exceptions</div><div class="sum-value" id="sumExc" style="font-size:13px;padding-top:4px;">—</div><div class="sum-sub" id="sumExcSub"></div></div>
       </div>
       <div class="billing-note" id="billingNoteBar" style="display:none;"><div class="billing-note-icon">🧾</div><div class="billing-note-text" id="billingNoteText"></div></div>
       <div class="comments-panel" id="commentsPanel">
@@ -326,7 +327,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
         </div>
         <div class="add-form" id="addForm">
           <div class="fg" id="descRow">
-            <div class="field"><label>Description</label><input type="text" id="fDesc" placeholder="e.g. Gas station"></div>
+            <div class="field"><label>Destination</label><input type="text" id="fDesc" placeholder="e.g. San Antonio"></div>
             <div class="field"><label>Date</label><input type="date" id="fDate"></div>
           </div>
           <div class="field" style="margin-bottom:10px;"><label>Category</label><div class="chip-row" id="chipRow"></div></div>
@@ -338,8 +339,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
           <div class="mf" id="miFields">
             <div class="field"><label>Start Odo</label><input type="number" id="fOdoS" placeholder="45200"></div>
             <div class="field"><label>End Odo</label><input type="number" id="fOdoE" placeholder="45258"></div>
-            <div class="field"><label>Rate ($/mi)</label><input type="number" id="fRate" step="0.001"></div>
-            <div class="mi-note" id="miRateNote">Current rate: $0.725/mi</div>
+            <div class="mi-note" id="miRateNote" style="grid-column:1/-1">Current rate: $0.725/mi</div>
           </div>
           <div class="fg" id="amtRow">
             <div class="field"><label>Amount ($)</label><input type="number" id="fAmt" placeholder="0.00" step="0.01" min="0"></div>
@@ -698,7 +698,7 @@ async function openTrip(id) {
   $('viewDetail').classList.add('active');
   $('detailTitle').textContent=activeTrip.name;
   $('expRows').innerHTML=loadingHTML('Loading expenses…');
-  $('sumTotal').textContent='—';$('sumReimburse').textContent='—';$('sumRec').textContent='—';
+  $('sumTotal').textContent='—';$('sumReimburse').textContent='—';$('sumRec').textContent='—';$('sumExc').textContent='—';
   const ownTrip=activeTrip.userEmail===currentUser.email;
   const _b=activeTrip.billing||''; const _bb=$('billingNoteBar'); if(_bb){_bb.style.display=_b?'':'none'; if(_b)$('billingNoteText').textContent=_b;}
   $('addPanelWrap').style.display=ownTrip?'':'none';
@@ -743,6 +743,27 @@ function renderDetail() {
   $('sumReimburseNote').textContent=nonReimburse>0?`${money(nonReimburse)} non-reimb.`:'all reimbursable';
   // mileage shown per-row only
   $('sumRec').textContent=recs;
+  // Exceptions: check if meals > perdiem total
+  const mealTotal = items.filter(e=>e.cat==='meals').reduce((s,e)=>s+(+e.amt||0),0);
+  const pdTotal   = items.filter(e=>e.cat==='perdiem').reduce((s,e)=>s+(+e.amt||0),0);
+  const excEl     = $('sumExc');
+  const excSub    = $('sumExcSub');
+  if(pdTotal > 0 && mealTotal > pdTotal) {
+    excEl.textContent = 'Meals > Per Diem';
+    excEl.style.color = 'var(--red)';
+    excEl.style.fontSize = '12px';
+    excSub.textContent = money(mealTotal) + ' meals vs ' + money(pdTotal) + ' PD';
+  } else if(pdTotal > 0 || mealTotal > 0) {
+    excEl.textContent = 'None';
+    excEl.style.color = 'var(--green)';
+    excEl.style.fontSize = '16px';
+    excSub.textContent = '';
+  } else {
+    excEl.textContent = '—';
+    excEl.style.color = '';
+    excEl.style.fontSize = '16px';
+    excSub.textContent = '';
+  }
   if(!items.length) {
     $('expRows').innerHTML='<div class="empty-list">No expenses yet — add your first one above</div>';
     return;
@@ -841,7 +862,7 @@ async function saveExpense() {
   const isMi=selectedCat==='mileage';
   let amt=0,miles=0;
   if(isMi){
-    const s=parseFloat($('fOdoS').value),en=parseFloat($('fOdoE').value),r=parseFloat($('fRate').value)||MILEAGE_RATE;
+    const s=parseFloat($('fOdoS').value),en=parseFloat($('fOdoE').value),r=MILEAGE_RATE;
     if(isNaN(s)||isNaN(en)||en<=s){showToast('Check odometer readings.');return;}
     miles=en-s; amt=miles*r;
   } else {
@@ -951,7 +972,6 @@ function saveVars() {
   localStorage.setItem('xpense_perdiem_rate', pd);
   // Update displayed rate note if mileage form is open
   if ($('miRateNote')) $('miRateNote').textContent = `Current rate: $${mi}/mi`;
-  if ($('fRate') && !$('fRate').value) $('fRate').value = mi;
   $('varsSaveNote').textContent = '✓ Rates saved';
   $('varsSaveNote').style.color = 'var(--green)';
   setTimeout(closeVarsModal, 900);
@@ -959,7 +979,6 @@ function saveVars() {
 
 // Init rate display on load
 function initRates() {
-  if ($('fRate')) $('fRate').value = MILEAGE_RATE;
   if ($('miRateNote')) $('miRateNote').textContent = `Current rate: $${MILEAGE_RATE}/mi`;
 }
 
