@@ -1,17 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+]<!DOCTYPE html>
+<!-- saved from url=(0049)file:///C:/Users/jmull/Downloads/index%20(3).html -->
+<html lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Xpense</title>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
-<script src="https://accounts.google.com/gsi/client" async defer></script>
+<link href="./Xpense_files/css2" rel="stylesheet">
+<script src="./Xpense_files/client" async="" defer=""></script>
 <style>
 :root {
   --ink:#111010;--ink2:#4a4845;--ink3:#9b9793;--paper:#faf9f7;--card:#fff;--rule:#ebebea;
   --amber:#d97706;--amber-bg:#fffbf0;--green:#166534;--green-bg:#f0fdf4;
   --red:#b91c1c;--red-bg:#fef2f2;--blue:#1d4ed8;--blue-bg:#eff6ff;
-  --sans:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--r:12px;
+  --sans:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--mono:'DM Mono','Courier New',monospace;--r:12px;
 }
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
@@ -53,6 +53,9 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .trip-total{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-0.02em;text-align:right;flex-shrink:0;}
 .trip-count{font-size:11px;color:var(--ink3);text-align:right;margin-top:2px;}
 .trip-arrow{color:var(--ink3);font-size:16px;flex-shrink:0;}
+.billing-note{font-size:12px;color:var(--ink2);background:var(--amber-bg);border:1px solid #fde68a;border-radius:8px;padding:8px 12px;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+.billing-note-icon{font-size:14px;flex-shrink:0;}
+.billing-note-text{flex:1;font-weight:500;}
 .trip-rename-btn{background:none;border:1px solid var(--rule);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--ink3);cursor:pointer;flex-shrink:0;opacity:0;transition:opacity 0.15s,border-color 0.15s;}
 .trip-card:hover .trip-rename-btn{opacity:1;}
 .trip-rename-btn:hover{border-color:var(--ink3);color:var(--ink);}
@@ -78,6 +81,10 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .detail-export:hover{border-color:var(--ink3);}
 .detail-rename{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-family:var(--display);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;flex-shrink:0;transition:all 0.15s;}
 .detail-rename:hover{border-color:var(--ink3);}
+.detail-close{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-family:var(--display);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;flex-shrink:0;transition:all 0.15s;}
+.detail-close:hover{border-color:var(--red);color:var(--red);}
+.detail-close.reopen{color:var(--green);}
+.detail-close.reopen:hover{border-color:var(--green);}
 .summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
 @media(max-width:480px){.summary-strip{grid-template-columns:1fr 1fr;}}
 .sum-card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;}
@@ -138,7 +145,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .exp-desc{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .exp-sub{font-size:11px;color:var(--ink3);margin-top:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
 .rbadge{background:var(--green-bg);color:var(--green);border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;cursor:pointer;}
-.exp-amt{font-family:var(--display);font-weight:700;font-size:15px;text-align:right;flex-shrink:0;min-width:70px;}
+.exp-amt{font-family:var(--mono);font-weight:500;font-size:15px;text-align:right;flex-shrink:0;min-width:70px;}
 .exp-del{background:none;border:none;cursor:pointer;color:var(--ink3);font-size:14px;padding:4px;border-radius:5px;opacity:0;transition:opacity 0.15s,color 0.15s,background 0.15s;flex-shrink:0;}
 .exp-row:hover .exp-del{opacity:1;}
 .exp-del:hover{color:var(--red);background:var(--red-bg);}
@@ -165,32 +172,21 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .config-notice code{background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;}
 @media print{.topbar,.add-panel,.back-btn,.detail-export,.detail-rename,.exp-del,.topbar-right,.admin-bar{display:none!important;}body{background:white;}.main{padding:0;}.exp-list-card,.sum-card{box-shadow:none;border:1px solid #ddd;}}
 </style>
-</head>
+<link id="googleidentityservice" type="text/css" media="all" href="./Xpense_files/style" rel="stylesheet"><style id="googleidentityservice_button_styles">.qJTHM{-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;color:#202124;direction:ltr;-webkit-touch-callout:none;font-family:"Roboto-Regular",arial,sans-serif;-webkit-font-smoothing:antialiased;font-weight:400;margin:0;overflow:hidden;-webkit-text-size-adjust:100%}.ynRLnc{left:-9999px;position:absolute;top:-9999px}.L6cTce{display:none}.bltWBb{overflow-wrap:break-word;word-break:break-word}.hSRGPd{color:#1a73e8;cursor:pointer;font-weight:500;text-decoration:none}.Bz112c-W3lGp{height:16px;width:16px}.Bz112c-E3DyYd{height:20px;width:20px}.Bz112c-r9oPif{height:24px;width:24px}.Bz112c-u2z5K{height:36px;width:36px}.Bz112c-uaxL4e{border-radius:10px}.LgbsSe-Bz112c{display:block}.S9gUrf-YoZ4jf{border:none;margin:0;padding:0}.S9gUrf-YoZ4jf *{border:none;margin:0;padding:0}.fFW7wc-ibnC6b>.aZ2wEe>div{border-color:#4285f4}.P1ekSe-ZMv3u{-webkit-transition:height linear .2s;transition:height linear .2s}.P1ekSe-ZMv3u>div:nth-child(1){background-color:#1a73e8!important;-webkit-transition:width linear .3s;transition:width linear .3s}.P1ekSe-ZMv3u>div:nth-child(2){background-image:-webkit-gradient(linear,left top,right top,from(rgba(255,255,255,.7)),to(rgba(255,255,255,.7))),-webkit-gradient(linear,left top,right top,from(#1a73e8),to(#1a73e8))!important;background-image:-webkit-linear-gradient(left,rgba(255,255,255,.7),rgba(255,255,255,.7)),-webkit-linear-gradient(left,#1a73e8,#1a73e8)!important;background-image:linear-gradient(to right,rgba(255,255,255,.7),rgba(255,255,255,.7)),linear-gradient(to right,#1a73e8,#1a73e8)!important}.P1ekSe-ZMv3u>div:nth-child(3){background-image:-webkit-gradient(linear,left top,right top,from(rgba(255,255,255,.7)),to(rgba(255,255,255,.7))),-webkit-gradient(linear,left top,right top,from(#1a73e8),to(#1a73e8))!important;background-image:-webkit-linear-gradient(left,rgba(255,255,255,.7),rgba(255,255,255,.7)),-webkit-linear-gradient(left,#1a73e8,#1a73e8)!important;background-image:linear-gradient(to right,rgba(255,255,255,.7),rgba(255,255,255,.7)),linear-gradient(to right,#1a73e8,#1a73e8)!important}.haAclf{display:inline-block}.nsm7Bb-HzV7m-LgbsSe{border-radius:4px;box-sizing:border-box;-webkit-transition:background-color .218s,border-color .218s;transition:background-color .218s,border-color .218s;-moz-user-select:none;-webkit-user-select:none;-ms-user-select:none;-webkit-appearance:none;background-color:#fff;background-image:none;border:1px solid #dadce0;color:#3c4043;cursor:pointer;font-family:"Google Sans",arial,sans-serif;font-size:14px;height:40px;letter-spacing:.25px;outline:none;overflow:hidden;padding:0 12px;position:relative;text-align:center;vertical-align:middle;white-space:nowrap;width:auto}@media screen and (-ms-high-contrast:active){.nsm7Bb-HzV7m-LgbsSe{border:2px solid windowText;color:windowText}}@media screen and (preferes-contrast:more){.nsm7Bb-HzV7m-LgbsSe{color:#000}}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe{font-size:14px;height:32px;letter-spacing:.25px;padding:0 10px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe{font-size:11px;height:20px;letter-spacing:.3px;padding:0 8px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe{padding:0;width:40px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.pSzOP-SxQuSe{width:32px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.purZT-SxQuSe{width:20px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK{border-radius:20px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK.pSzOP-SxQuSe{border-radius:16px}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK.purZT-SxQuSe{border-radius:10px}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc{border:none;color:#fff}.nsm7Bb-HzV7m-LgbsSe.MFS4be-v3pZbf-Ia7Qfc{background-color:#1a73e8}.nsm7Bb-HzV7m-LgbsSe.MFS4be-JaPV2b-Ia7Qfc{background-color:#202124;color:#e8eaed}@media screen and (prefers-contrast:more){.nsm7Bb-HzV7m-LgbsSe.MFS4be-JaPV2b-Ia7Qfc{color:#fff}}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:18px;margin-right:8px;min-width:18px;width:18px}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:14px;min-width:14px;width:14px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{height:10px;min-width:10px;width:10px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin-left:8px;margin-right:-4px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin:0;padding:10px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{padding:8px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c{padding:4px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-top-left-radius:3px;border-bottom-left-radius:3px;display:-webkit-box;display:-webkit-flex;display:flex;-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center;-webkit-box-align:center;-webkit-align-items:center;align-items:center;background-color:#fff;height:36px;margin-left:-10px;margin-right:12px;min-width:36px;width:36px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf .nsm7Bb-HzV7m-LgbsSe-Bz112c,.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf .nsm7Bb-HzV7m-LgbsSe-Bz112c{margin:0;padding:0}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{height:28px;margin-left:-8px;margin-right:10px;min-width:28px;width:28px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{height:16px;margin-left:-6px;margin-right:8px;min-width:16px;width:16px}.nsm7Bb-HzV7m-LgbsSe.Bz112c-LgbsSe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:3px;margin-left:2px;margin-right:0;padding:0}.nsm7Bb-HzV7m-LgbsSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:18px}.nsm7Bb-HzV7m-LgbsSe.pSzOP-SxQuSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:14px}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:8px}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-bN97Pc-sM5MNb{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;-webkit-box-align:center;align-items:center;-webkit-flex-direction:row;-webkit-box-orient:horizontal;-webkit-box-direction:normal;flex-direction:row;-webkit-box-pack:justify;-webkit-justify-content:space-between;justify-content:space-between;-webkit-flex-wrap:nowrap;flex-wrap:nowrap;height:100%;position:relative;width:100%}.nsm7Bb-HzV7m-LgbsSe .oXtfBe-l4eHX{-webkit-box-pack:center;-webkit-justify-content:center;justify-content:center}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-BPrWId{-webkit-flex-grow:1;-webkit-box-flex:1;flex-grow:1;font-family:"Google Sans",arial,sans-serif;font-weight:500;overflow:hidden;text-overflow:ellipsis;vertical-align:top}.nsm7Bb-HzV7m-LgbsSe.purZT-SxQuSe .nsm7Bb-HzV7m-LgbsSe-BPrWId{font-weight:300}.nsm7Bb-HzV7m-LgbsSe .oXtfBe-l4eHX .nsm7Bb-HzV7m-LgbsSe-BPrWId{-webkit-flex-grow:0;-webkit-box-flex:0;flex-grow:0}.nsm7Bb-HzV7m-LgbsSe .nsm7Bb-HzV7m-LgbsSe-MJoBVe{-webkit-transition:background-color .218s;transition:background-color .218s;bottom:0;left:0;position:absolute;right:0;top:0}.nsm7Bb-HzV7m-LgbsSe:hover,.nsm7Bb-HzV7m-LgbsSe:focus{box-shadow:none;border-color:rgb(210,227,252);outline:none}.nsm7Bb-HzV7m-LgbsSe:focus-within{outline:2px solid #00639b;border-color:transparent}.nsm7Bb-HzV7m-LgbsSe:hover .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(66,133,244,.08)}.nsm7Bb-HzV7m-LgbsSe:active .nsm7Bb-HzV7m-LgbsSe-MJoBVe,.nsm7Bb-HzV7m-LgbsSe:focus .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(66,133,244,.1)}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:hover .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(255,255,255,.24)}.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:active .nsm7Bb-HzV7m-LgbsSe-MJoBVe,.nsm7Bb-HzV7m-LgbsSe.MFS4be-Ia7Qfc:focus .nsm7Bb-HzV7m-LgbsSe-MJoBVe{background:rgba(255,255,255,.32)}.nsm7Bb-HzV7m-LgbsSe .n1UuX-DkfjY{border-radius:50%;display:-webkit-box;display:-webkit-flex;display:flex;height:20px;margin-left:-4px;margin-right:8px;min-width:20px;width:20px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId{font-family:"Roboto";font-size:12px;text-align:left}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .ssJRIf,.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff .fmcmS{overflow:hidden;text-overflow:ellipsis}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{display:-webkit-box;display:-webkit-flex;display:flex;-webkit-align-items:center;-webkit-box-align:center;align-items:center;color:#5f6368;fill:#5f6368;font-size:11px;font-weight:400}.nsm7Bb-HzV7m-LgbsSe.jVeSEe.MFS4be-Ia7Qfc .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{color:#e8eaed;fill:#e8eaed}@media screen and (prefers-contrast:more){.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff,.nsm7Bb-HzV7m-LgbsSe.jVeSEe.MFS4be-Ia7Qfc .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff{color:#000;fill:#000}}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-BPrWId .K4efff .Bz112c{height:18px;margin:-3px -3px -3px 2px;min-width:18px;width:18px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-top-left-radius:0;border-bottom-left-radius:0;border-top-right-radius:3px;border-bottom-right-radius:3px;margin-left:12px;margin-right:-10px}.nsm7Bb-HzV7m-LgbsSe.jVeSEe.JGcpL-RbRzK .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf{border-radius:18px}.L5Fo6c-sM5MNb{border:0;display:block;left:0;position:relative;top:0}.L5Fo6c-bF1uUb{border-radius:4px;bottom:0;cursor:pointer;left:0;position:absolute;right:0;top:0}.L5Fo6c-bF1uUb:focus{border:none;outline:none}sentinel{}</style></head>
 <body>
 
 <!-- LOGIN SCREEN -->
 <div id="loginScreen" class="login-screen">
   <div class="login-card">
     <div class="login-logo">
-      <img src="data:image/png;base64,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" alt="Synergy Solutions"/>
+      <img src="data:image/png;base64,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" alt="Synergy Solutions">
       <div class="login-logo-text">X<span>.</span>pense</div>
     </div>
     <div class="login-sub">Business Expense Tracking</div>
-    <div id="g_id_onload"
-      data-client_id="1039086156302-29g6ar5o63ememg0k81bltr5096delmc.apps.googleusercontent.com"
-      data-callback="handleGoogleSignIn"
-      data-auto_prompt="false">
+    <div id="g_id_onload" data-client_id="1039086156302-29g6ar5o63ememg0k81bltr5096delmc.apps.googleusercontent.com" data-callback="handleGoogleSignIn" data-auto_prompt="false">
     </div>
-    <div class="g_id_signin"
-      data-type="standard"
-      data-size="large"
-      data-theme="outline"
-      data-text="sign_in_with"
-      data-shape="rectangular"
-      data-logo_alignment="left"
-      data-width="280">
-    </div>
-    <div class="login-note">Sign in with your Google account.<br/>Your expenses are private to you.</div>
+    <div class="g_id_signin" data-type="standard" data-size="large" data-theme="outline" data-text="sign_in_with" data-shape="rectangular" data-logo_alignment="left" data-width="280"><div class="S9gUrf-YoZ4jf" style="position: relative;"><div><div tabindex="0" role="button" aria-labelledby="button-label" class="nsm7Bb-HzV7m-LgbsSe  hJDwNd-SxQuSe i5vt6e-Ia7Qfc uaxL4e-RbRzK" style="width:280px; max-width:400px; min-width:min-content;"><div class="nsm7Bb-HzV7m-LgbsSe-MJoBVe"></div><div class="nsm7Bb-HzV7m-LgbsSe-bN97Pc-sM5MNb "><div class="nsm7Bb-HzV7m-LgbsSe-Bz112c"><svg version="1.1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" class="LgbsSe-Bz112c"><g><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"></path><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"></path><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"></path><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"></path><path fill="none" d="M0 0h48v48H0z"></path></g></svg></div><span class="nsm7Bb-HzV7m-LgbsSe-BPrWId">Sign in with Google</span><span class="L6cTce" id="button-label">Sign in with Google. Opens in new tab</span></div></div></div><iframe src="./Xpense_files/button.html" class="L5Fo6c-PQbLGe" allow="identity-credentials-get" id="gsi_952983_844556" title="Sign in with Google Button" style="display: block; position: relative; top: 0px; left: 0px; height: 0px; width: 0px; border: 0px;"></iframe></div></div>
+    <div class="login-note">Sign in with your Google account.<br>Your expenses are private to you.</div>
   </div>
 </div>
 
@@ -198,27 +194,27 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 <div id="appShell" style="display:none;">
   <header class="topbar">
     <div class="topbar-brand">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAEV0lEQVR42pWWT2yUVRTFf/d+30zLn3a+QTHEhXFrqHEhroBSsBAgauvCLiiJsjIxBrEJunBBXLhgATUxbk0A66JswEjUSOyfKS0IbiwY124Ekc5M/04737vXRWdKW1qFt3vJyznn3XfuuQ/WWd5P5KfQ+j4t5Lt8KLkThpLfvZDvWjp3CvV+ovVwZC1g3sJEcAAfSd4wlQ9VPcuc9xIBGenBZR7zXtlV+hbAHeEiKl2Ex1JcHc51htF8wceSGz6SdD9yfjTpDmPJLz6aL/hwrnPdG60G9pGkI4zmh/16cj1dBuwDxO6IO+IDxMvOd/tYcsPH8sM+knSsT3Qt11kH9tH8kVXAWhOT9X6ytZLo4xBJdSB/MG7gfcSfwfhCdpYu1IFpw0Qw7yfLs7kjFuRjAMVPc6/8jXSx4I4yiMpe0jqRRXygxgxBTovfzLvN2fmotfx2XZkIVlfMtly3IT3aKC1UfFFWo8A847j1crfct0QEvmSO4eQ9hC8lDCQpSgVlzIKczbQVv/dCLh+MDoETukFfouLYAqlukhjAZjzVLDGNglX8tuJn2VLukxYW/BYZ2UF1oj+fyz1lf4r9nLgIsEEgApu0r3H5S7fpSargDwxpFkjBKn4Jd9EN2oGAzXrQRonIgk3abdXqftpm74ngPpB73oxxrZUFm/Yq87jCHk1Kn/BP2GdT9qNslCIV+ki9LdpXejN6tdyJ+x5SviOD27ynTHrQBm0h6JZ6iVANi+/1sOUiBAGZlleoSlt5IGotHST1M6lzQVpLQ3Vby87SsOwuvk7K57pZYgO3eQ9kJV3dL7pGb6sb4rfJuiNUaYq3yg9hKPnJB3LtNYc1uqNucn9ZFijVR5NB18sQthNEcIOYGQ+akXacy2zNNXGfKo+5dJ18etjZLn8TL3akucyw0SLpIohgor61VnEAI7NstyaBAE4qQuDiYrNFUfEsRV4z82sImwlTswtXk92hkFwh5oRNe6og2iARCx6vJohXwKc4MVvmB/MvSltxfOlRu4pXgCs+0HzQKsmlTCMHiGS1Tcc1sgl3RATHLAJQB3MIIohVHWBbVv2WF5Kv/Fq+pR6/7kRMTQ7j7CYlsOBok0QExsOsHdNc+WXZO3uXX2ui56IJwGLNihJDmHYXxSxFVcjSJMeY824vJH0E6RUpjvstoAw0ScSs/cac97Kp3BfvoOqO1tQvGmCzHVWRZvGr+UMW+wltkAMI2Iwb4ICrENMk2JxXCZwPgXMZ9c9CxLnoj/J5eXcR+D/Dbsktheb95npSY9mPriQSIZacQNnKVKLn5PDEpDsRg8hyYCKOg8wT/IzsKl0GEO8n4g4un9YSdC0ixzQDGGWi9AXCdHGV4uO6CthPoWxHZMUsXk2EfqSxtCNAxcF4IPtKT9eAj1rEcVzmLbUzmdbypRXANXOsPfRXEOXacekhlkNWsSkXeiQr72gkVdInGPr/+wkYzB8OQ8lNH0r+eJJvy79IEppejI1pCgAAAABJRU5ErkJggg==" alt=""/>
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAEV0lEQVR42pWWT2yUVRTFf/d+30zLn3a+QTHEhXFrqHEhroBSsBAgauvCLiiJsjIxBrEJunBBXLhgATUxbk0A66JswEjUSOyfKS0IbiwY124Ekc5M/04737vXRWdKW1qFt3vJyznn3XfuuQ/WWd5P5KfQ+j4t5Lt8KLkThpLfvZDvWjp3CvV+ovVwZC1g3sJEcAAfSd4wlQ9VPcuc9xIBGenBZR7zXtlV+hbAHeEiKl2Ex1JcHc51htF8wceSGz6SdD9yfjTpDmPJLz6aL/hwrnPdG60G9pGkI4zmh/16cj1dBuwDxO6IO+IDxMvOd/tYcsPH8sM+knSsT3Qt11kH9tH8kVXAWhOT9X6ytZLo4xBJdSB/MG7gfcSfwfhCdpYu1IFpw0Qw7yfLs7kjFuRjAMVPc6/8jXSx4I4yiMpe0jqRRXygxgxBTovfzLvN2fmotfx2XZkIVlfMtly3IT3aKC1UfFFWo8A847j1crfct0QEvmSO4eQ9hC8lDCQpSgVlzIKczbQVv/dCLh+MDoETukFfouLYAqlukhjAZjzVLDGNglX8tuJn2VLukxYW/BYZ2UF1oj+fyz1lf4r9nLgIsEEgApu0r3H5S7fpSargDwxpFkjBKn4Jd9EN2oGAzXrQRonIgk3abdXqftpm74ngPpB73oxxrZUFm/Yq87jCHk1Kn/BP2GdT9qNslCIV+ki9LdpXejN6tdyJ+x5SviOD27ynTHrQBm0h6JZ6iVANi+/1sOUiBAGZlleoSlt5IGotHST1M6lzQVpLQ3Vby87SsOwuvk7K57pZYgO3eQ9kJV3dL7pGb6sb4rfJuiNUaYq3yg9hKPnJB3LtNYc1uqNucn9ZFijVR5NB18sQthNEcIOYGQ+akXacy2zNNXGfKo+5dJ18etjZLn8TL3akucyw0SLpIohgor61VnEAI7NstyaBAE4qQuDiYrNFUfEsRV4z82sImwlTswtXk92hkFwh5oRNe6og2iARCx6vJohXwKc4MVvmB/MvSltxfOlRu4pXgCs+0HzQKsmlTCMHiGS1Tcc1sgl3RATHLAJQB3MIIohVHWBbVv2WF5Kv/Fq+pR6/7kRMTQ7j7CYlsOBok0QExsOsHdNc+WXZO3uXX2ui56IJwGLNihJDmHYXxSxFVcjSJMeY824vJH0E6RUpjvstoAw0ScSs/cac97Kp3BfvoOqO1tQvGmCzHVWRZvGr+UMW+wltkAMI2Iwb4ICrENMk2JxXCZwPgXMZ9c9CxLnoj/J5eXcR+D/Dbsktheb95npSY9mPriQSIZacQNnKVKLn5PDEpDsRg8hyYCKOg8wT/IzsKl0GEO8n4g4un9YSdC0ixzQDGGWi9AXCdHGV4uO6CthPoWxHZMUsXk2EfqSxtCNAxcF4IPtKT9eAj1rEcVzmLbUzmdbypRXANXOsPfRXEOXacekhlkNWsSkXeiQr72gkVdInGPr/+wkYzB8OQ8lNH0r+eJJvy79IEppejI1pCgAAAABJRU5ErkJggg==" alt="">
       X.pense
     </div>
     <div class="topbar-right">
-      <button class="topbar-btn" onclick="exportAllCSV()">↓ All CSV</button>
-      <button class="topbar-btn admin" id="adminBtn" onclick="toggleAdminView()" style="display:none;">⚙ Admin</button>
+      <button class="topbar-btn" onclick="exportAllCSV()">Ã¢ÂÂ All CSV</button>
+      <button class="topbar-btn admin" id="adminBtn" onclick="toggleAdminView()" style="display:none;">Ã¢ÂÂ Admin</button>
       <div class="user-avatar" id="userAvatar" title=""></div>
     </div>
   </header>
 
   <main class="main">
     <div class="config-notice" id="configNotice" style="display:none;">
-      <strong>⚙️ Setup Required:</strong> Configure <code>APPS_SCRIPT_URL</code> in the script section.
+      <strong>Ã¢ÂÂÃ¯Â¸Â Setup Required:</strong> Configure <code>APPS_SCRIPT_URL</code> in the script section.
     </div>
 
     <!-- TRIPS VIEW -->
     <div class="view active" id="viewTrips">
       <div class="admin-bar" id="adminBar" style="display:none;">
         <div>
-          <div class="admin-bar-title">⚙️ Admin View</div>
-          <div class="admin-bar-sub" id="adminBarSub">Loading summary…</div>
+          <div class="admin-bar-title">Ã¢ÂÂÃ¯Â¸Â Admin View</div>
+          <div class="admin-bar-sub" id="adminBarSub">Loading summaryÃ¢ÂÂ¦</div>
         </div>
         <div class="admin-filter">
           <select class="admin-select" id="adminUserFilter" onchange="onAdminFilterChange()">
@@ -228,7 +224,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
       </div>
       <div class="trips-header">
         <div class="trips-heading" id="tripsHeading">My Trips</div>
-        <button class="btn-primary" onclick="openNewTrip()">＋ New Trip</button>
+        <button class="btn-primary" onclick="openNewTrip()">Ã¯Â¼Â New Trip</button>
       </div>
       <div id="tripsList"></div>
     </div>
@@ -236,52 +232,53 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
     <!-- DETAIL VIEW -->
     <div class="view" id="viewDetail">
       <div class="detail-topbar">
-        <button class="back-btn" onclick="goBack()">← Back</button>
+        <button class="back-btn" onclick="goBack()">Ã¢ÂÂ Back</button>
         <div class="detail-title" id="detailTitle"></div>
-        <button class="detail-rename" id="renameBtn" onclick="openRenameModal()">✏️ Rename</button>
-        <button class="detail-export" onclick="exportTripCSV()">↓ CSV</button>
+        <button class="detail-rename" id="renameBtn" onclick="openRenameModal()">Ã¢ÂÂÃ¯Â¸Â Rename</button>
+        <button class="detail-export" onclick="exportTripCSV()">Ã¢ÂÂ CSV</button>
       </div>
       <div class="summary-strip">
-        <div class="sum-card"><div class="sum-label">Total</div><div class="sum-value amber" id="sumTotal">—</div><div class="sum-sub" id="sumCount"></div></div>
-        <div class="sum-card"><div class="sum-label">Mileage</div><div class="sum-value" id="sumMiles">—</div><div class="sum-sub" id="sumMiCost"></div></div>
-        <div class="sum-card"><div class="sum-label">Receipts</div><div class="sum-value" id="sumRec">—</div><div class="sum-sub">attached</div></div>
+        <div class="sum-card"><div class="sum-label">Total</div><div class="sum-value amber" id="sumTotal">Ã¢ÂÂ</div><div class="sum-sub" id="sumCount"></div></div>
+        <div class="sum-card"><div class="sum-label">Mileage</div><div class="sum-value" id="sumMiles">Ã¢ÂÂ</div><div class="sum-sub" id="sumMiCost"></div></div>
+        <div class="sum-card"><div class="sum-label">Receipts</div><div class="sum-value" id="sumRec">Ã¢ÂÂ</div><div class="sum-sub">attached</div></div>
       </div>
+      <div class="billing-note" id="billingNoteBar" style="display:none;"><div class="billing-note-icon">🧾</div><div class="billing-note-text" id="billingNoteText"></div></div>
       <div class="add-panel" id="addPanelWrap">
         <div class="add-panel-head" id="addHead" onclick="toggleAdd()">
           <span class="add-panel-title">Add Expense</span>
-          <button class="add-toggle" id="addToggle">＋</button>
+          <button class="add-toggle" id="addToggle">Ã¯Â¼Â</button>
         </div>
         <div class="add-form" id="addForm">
           <div class="fg">
-            <div class="field"><label>Description</label><input type="text" id="fDesc" placeholder="e.g. Gas station"/></div>
-            <div class="field"><label>Date</label><input type="date" id="fDate"/></div>
+            <div class="field"><label>Description</label><input type="text" id="fDesc" placeholder="e.g. Gas station"></div>
+            <div class="field"><label>Date</label><input type="date" id="fDate"></div>
           </div>
           <div class="field" style="margin-bottom:10px;"><label>Category</label><div class="chip-row" id="chipRow"></div></div>
           <div class="mi-row">
-            <label class="tog-wrap"><input type="checkbox" id="miTog" onchange="onMiTog()"/><span class="tog-slider"></span></label>
+            <label class="tog-wrap"><input type="checkbox" id="miTog" onchange="onMiTog()"><span class="tog-slider"></span></label>
             <span class="mi-label">This is a mileage expense</span>
           </div>
           <div class="mf" id="miFields">
-            <div class="field"><label>Start Odo</label><input type="number" id="fOdoS" placeholder="45200"/></div>
-            <div class="field"><label>End Odo</label><input type="number" id="fOdoE" placeholder="45258"/></div>
-            <div class="field"><label>Rate ($/mi)</label><input type="number" id="fRate" value="0.725" step="0.001"/></div>
+            <div class="field"><label>Start Odo</label><input type="number" id="fOdoS" placeholder="45200"></div>
+            <div class="field"><label>End Odo</label><input type="number" id="fOdoE" placeholder="45258"></div>
+            <div class="field"><label>Rate ($/mi)</label><input type="number" id="fRate" value="0.725" step="0.001"></div>
             <div class="mi-note">Current rate: $0.725/mi</div>
           </div>
           <div class="fg" id="amtRow">
-            <div class="field"><label>Amount ($)</label><input type="number" id="fAmt" placeholder="0.00" step="0.01" min="0"/></div>
-            <div class="field"><label>Vendor</label><input type="text" id="fVendor" placeholder="e.g. Hilton"/></div>
+            <div class="field"><label>Amount ($)</label><input type="number" id="fAmt" placeholder="0.00" step="0.01" min="0"></div>
+            <div class="field"><label>Vendor</label><input type="text" id="fVendor" placeholder="e.g. Hilton"></div>
           </div>
           <div class="fg full" style="margin-bottom:10px;">
-            <div class="field"><label>Notes</label><input type="text" id="fNotes" placeholder="Client, project, purpose…"/></div>
+            <div class="field"><label>Notes</label><input type="text" id="fNotes" placeholder="Client, project, purposeÃ¢ÂÂ¦"></div>
           </div>
           <div class="receipt-prev" id="rPrev">
-            <img id="rThumb" src="" alt=""/>
+            <img id="rThumb" src="file:///C:/Users/jmull/Downloads/index%20(3).html" alt="">
             <span class="receipt-prev-name" id="rName"></span>
-            <button class="rclear" onclick="clearReceipt()">✕</button>
+            <button class="rclear" onclick="clearReceipt()">Ã¢ÂÂ</button>
           </div>
           <div class="receipt-area" id="rArea">
-            <input type="file" id="fReceipt" accept="image/*" capture="environment" onchange="onReceipt(event)"/>
-            <div style="font-size:22px;margin-bottom:4px;">📎</div>
+            <input type="file" id="fReceipt" accept="image/*" capture="environment" onchange="onReceipt(event)">
+            <div style="font-size:22px;margin-bottom:4px;">Ã°ÂÂÂ</div>
             <div style="font-size:12px;color:var(--ink3);">Tap to attach receipt photo</div>
           </div>
           <div class="form-actions">
@@ -299,8 +296,9 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 <div class="overlay" id="tripModal">
   <div class="modal">
     <div class="modal-title">New Trip / Project</div>
-    <div><span class="modal-label">Trip Name</span><input class="modal-input" type="text" id="newTripName" placeholder="e.g. Dallas Sales Visit"/></div>
+    <div><span class="modal-label">Trip Name</span><input class="modal-input" type="text" id="newTripName" placeholder="e.g. Dallas Sales Visit"></div>
     <div><span class="modal-label">Icon</span><div class="icon-picker" id="iconPicker"></div></div>
+    <div style="margin-bottom:14px;"><span class="modal-label">Billing / Notes (optional)</span><input class="modal-input" type="text" id="newTripBilling" placeholder="e.g. Bill to: ABC Corp" style="margin-bottom:0;"></div>
     <div class="modal-btns">
       <button class="btn-ghost" onclick="closeTripModal()">Cancel</button>
       <button class="btn-save" id="createTripBtn" onclick="createTrip()">Create</button>
@@ -312,7 +310,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 <div class="overlay" id="renameModal">
   <div class="modal">
     <div class="modal-title">Rename Trip</div>
-    <div><span class="modal-label">New Name</span><input class="modal-input" type="text" id="renameTripInput" placeholder="Enter new trip name"/></div>
+    <div><span class="modal-label">New Name</span><input class="modal-input" type="text" id="renameTripInput" placeholder="Enter new trip name"></div>
     <div class="modal-btns">
       <button class="btn-ghost" onclick="closeRenameModal()">Cancel</button>
       <button class="btn-save" id="renameTripBtn" onclick="confirmRename()">Save</button>
@@ -322,7 +320,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 
 <!-- LIGHTBOX -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox()">
-  <img id="lbImg" src="" alt="Receipt"/>
+  <img id="lbImg" src="file:///C:/Users/jmull/Downloads/index%20(3).html" alt="Receipt">
 </div>
 
 <!-- TOAST -->
@@ -333,16 +331,16 @@ const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/synergy-solutionsllc
 const ADMIN_EMAIL     = 'jmullins@synergy-solutionsllc.com';
 
 const CATS = [
-  {id:'meals',   label:'Meals',   icon:'🍽️', bg:'#fce7f3'},
-  {id:'travel',  label:'Travel',  icon:'✈️',  bg:'#dbeafe'},
-  {id:'lodging', label:'Lodging', icon:'🏨',  bg:'#ede9fe'},
-  {id:'fuel',    label:'Fuel',    icon:'⛽',  bg:'#fef3c7'},
-  {id:'mileage', label:'Mileage', icon:'🚗',  bg:'#fff7ed'},
-  {id:'supplies',label:'Supplies',icon:'📦',  bg:'#dcfce7'},
-  {id:'parking', label:'Parking', icon:'🅿️', bg:'#e0f2fe'},
-  {id:'other',   label:'Other',   icon:'📎',  bg:'#f3f4f6'},
+  {id:'meals',   label:'Meals',   icon:'Ã°ÂÂÂ½Ã¯Â¸Â', bg:'#fce7f3'},
+  {id:'travel',  label:'Travel',  icon:'Ã¢ÂÂÃ¯Â¸Â',  bg:'#dbeafe'},
+  {id:'lodging', label:'Lodging', icon:'Ã°ÂÂÂ¨',  bg:'#ede9fe'},
+  {id:'fuel',    label:'Fuel',    icon:'Ã¢ÂÂ½',  bg:'#fef3c7'},
+  {id:'mileage', label:'Mileage', icon:'Ã°ÂÂÂ',  bg:'#fff7ed'},
+  {id:'supplies',label:'Supplies',icon:'Ã°ÂÂÂ¦',  bg:'#dcfce7'},
+  {id:'parking', label:'Parking', icon:'Ã°ÂÂÂ¿Ã¯Â¸Â', bg:'#e0f2fe'},
+  {id:'other',   label:'Other',   icon:'Ã°ÂÂÂ',  bg:'#f3f4f6'},
 ];
-const ICONS = ['✈️','🚗','🏙️','🤝','📊','🏕️','🔧','🎯','💼','🌎'];
+const ICONS = ['Ã¢ÂÂÃ¯Â¸Â','Ã°ÂÂÂ','Ã°ÂÂÂÃ¯Â¸Â','Ã°ÂÂ¤Â','Ã°ÂÂÂ','Ã°ÂÂÂÃ¯Â¸Â','Ã°ÂÂÂ§','Ã°ÂÂÂ¯','Ã°ÂÂÂ¼','Ã°ÂÂÂ'];
 
 let currentUser=null, isAdmin=false, adminMode=false;
 let trips=[], activeTrip=null, activeExpenses=[];
@@ -350,7 +348,7 @@ let selectedCat='other', receiptData=null, selectedIcon=ICONS[0];
 
 const $ = id => document.getElementById(id);
 const money = n => '$' + (+n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
-const fmtDate = s => { const d=new Date(s+'T12:00:00'); return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+const fmtDate = s => { const raw=String(s||''); const clean=raw.includes('T')?raw:raw+'T12:00:00'; const d=new Date(clean); return isNaN(d)?raw:d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
 const catById = id => CATS.find(c=>c.id===id)||CATS[CATS.length-1];
 const uid = () => 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
 
@@ -388,7 +386,7 @@ async function api(action, extra={}) {
   return data;
 }
 
-// ── DUPLICATE NAME PROTECTION ──────────────────────────────
+// Ã¢ÂÂÃ¢ÂÂ DUPLICATE NAME PROTECTION Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 function uniqueTripName(name) {
   const existing = trips.filter(t => t.userEmail===currentUser.email).map(t => t.name.toLowerCase());
   if(!existing.includes(name.toLowerCase())) return name;
@@ -398,7 +396,7 @@ function uniqueTripName(name) {
 }
 
 async function loadTrips() {
-  $('tripsList').innerHTML=loadingHTML('Loading trips…');
+  $('tripsList').innerHTML=loadingHTML('Loading tripsÃ¢ÂÂ¦');
   try {
     const params={};
     if(adminMode && $('adminUserFilter').value) params.filterEmail=$('adminUserFilter').value;
@@ -411,11 +409,11 @@ async function loadTrips() {
   }
 }
 
-function loadingHTML(msg='Loading…') {
+function loadingHTML(msg='LoadingÃ¢ÂÂ¦') {
   return `<div class="loading"><div class="spinner"></div><div class="loading-text">${msg}</div></div>`;
 }
 function errorHTML(msg) {
-  return `<div class="empty-state"><div class="empty-emoji">⚠️</div><div class="empty-title">Error</div><div class="empty-sub">${msg}</div></div>`;
+  return `<div class="empty-state"><div class="empty-emoji">Ã¢ÂÂ Ã¯Â¸Â</div><div class="empty-title">Error</div><div class="empty-sub">${msg}</div></div>`;
 }
 
 async function loadAdminSummary() {
@@ -423,22 +421,22 @@ async function loadAdminSummary() {
   try {
     const res=await api('getAdminSummary');
     const s=res.summary;
-    $('adminBarSub').textContent=`${s.totalUsers} users · ${s.totalTrips} trips · ${money(s.grandTotal)} total`;
+    $('adminBarSub').textContent=`${s.totalUsers} users ÃÂ· ${s.totalTrips} trips ÃÂ· ${money(s.grandTotal)} total`;
     const sel=$('adminUserFilter'), cur=sel.value;
     sel.innerHTML='<option value="">All Users</option>'+(s.byUser||[]).map(u=>`<option value="${u.email}" ${u.email===cur?'selected':''}>${u.name} (${money(u.total)})</option>`).join('');
   } catch(e) {/* silent */}
 }
 
 function renderTrips() {
-  const heading=adminMode?'All Users — Trips':'My Trips';
+  const heading=adminMode?'All Users Ã¢ÂÂ Trips':'My Trips';
   $('tripsHeading').textContent=heading;
   if(!trips.length) {
     $('tripsList').innerHTML=`
       <div class="empty-state">
-        <div class="empty-emoji">🧳</div>
+        <div class="empty-emoji">Ã°ÂÂ§Â³</div>
         <div class="empty-title">${adminMode?'No trips found':'No trips yet'}</div>
         <div class="empty-sub">${adminMode?'No expenses submitted yet.':'Create your first trip to start tracking.'}</div>
-        ${!adminMode?'<button class="btn-primary" onclick="openNewTrip()">＋ Create Trip</button>':''}
+        ${!adminMode?'<button class="btn-primary" onclick="openNewTrip()">Ã¯Â¼Â Create Trip</button>':''}
       </div>`;
     return;
   }
@@ -447,20 +445,20 @@ function renderTrips() {
     const ownTrip=t.userEmail===currentUser.email;
     return `
     <div class="trip-card" style="animation-delay:${i*0.04}s" onclick="openTrip('${t.id}')">
-      <div class="trip-icon">${t.icon||'✈️'}</div>
+      <div class="trip-icon">${t.icon||'Ã¢ÂÂÃ¯Â¸Â'}</div>
       <div class="trip-info">
         <div class="trip-name">${escHtml(t.name)}</div>
         <div class="trip-meta">
           ${fmtDate(t.created)}
-          ${showUser?`<span class="trip-user-tag">👤 ${escHtml(t.userName)}</span>`:''}
+          ${showUser?`<span class="trip-user-tag">Ã°ÂÂÂ¤ ${escHtml(t.userName)}</span>`:''}
         </div>
       </div>
       <div>
-        <div class="trip-total">—</div>
+        <div class="trip-total">Ã¢ÂÂ</div>
         <div class="trip-count">tap to view</div>
       </div>
-      ${ownTrip?`<button class="trip-rename-btn" onclick="event.stopPropagation();openRenameTripFromList('${t.id}')">✏️</button>`:''}
-      <div class="trip-arrow">›</div>
+      ${ownTrip?`<button class="trip-rename-btn" onclick="event.stopPropagation();openRenameTripFromList('${t.id}')">Ã¢ÂÂÃ¯Â¸Â</button>`:''}
+      <div class="trip-arrow">Ã¢ÂÂº</div>
     </div>`;
   }).join('');
 }
@@ -468,7 +466,7 @@ function renderTrips() {
 function toggleAdminView() {
   adminMode=!adminMode;
   $('adminBar').style.display=adminMode?'':'none';
-  $('adminBtn').textContent=adminMode?'← My View':'⚙ Admin';
+  $('adminBtn').textContent=adminMode?'Ã¢ÂÂ My View':'Ã¢ÂÂ Admin';
   loadTrips();
 }
 function onAdminFilterChange() { loadTrips(); }
@@ -492,9 +490,9 @@ async function createTrip() {
   if(!name) { $('newTripName').focus(); return; }
   name=uniqueTripName(name);
   const btn=$('createTripBtn');
-  btn.disabled=true; btn.textContent='Creating…';
+  btn.disabled=true; btn.textContent='CreatingÃ¢ÂÂ¦';
   try {
-    const trip={id:uid(),name,icon:selectedIcon,created:new Date().toISOString().split('T')[0],userEmail:currentUser.email,userName:currentUser.name,archived:false};
+    const billing=$('newTripBilling')?$('newTripBilling').value.trim():''; const trip={id:uid(),name,icon:selectedIcon,billing,created:new Date().toISOString().split('T')[0],userEmail:currentUser.email,userName:currentUser.name,archived:false};
     await api('saveTrip',{trip});
     closeTripModal();
     await loadTrips();
@@ -506,7 +504,7 @@ async function createTrip() {
   }
 }
 
-// ── RENAME TRIP ────────────────────────────────────────────
+// Ã¢ÂÂÃ¢ÂÂ RENAME TRIP Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 let renamingTripId = null;
 
 function openRenameModal() {
@@ -544,7 +542,7 @@ async function confirmRename() {
     newName = newName + ' ' + counter;
   }
   const btn=$('renameTripBtn');
-  btn.disabled=true; btn.textContent='Saving…';
+  btn.disabled=true; btn.textContent='SavingÃ¢ÂÂ¦';
   try {
     const updated = {...trip, name:newName};
     await api('saveTrip',{trip:updated});
@@ -555,7 +553,7 @@ async function confirmRename() {
     }
     renderTrips();
     closeRenameModal();
-    showToast('Trip renamed ✓');
+    showToast('Trip renamed Ã¢ÂÂ');
   } catch(e) {
     showToast('Error: '+e.message);
   } finally {
@@ -563,17 +561,20 @@ async function confirmRename() {
   }
 }
 
+async function toggleTripClosed(){if(!activeTrip)return;const isClosed=activeTrip.closed===true||activeTrip.closed==='true';const btn=$('closeBtn');btn.disabled=true;try{const updated={...activeTrip,closed:!isClosed};await api('saveTrip',{trip:updated});activeTrip.closed=!isClosed;btn.textContent=!isClosed?'🔓 Reopen':'🔒 Close';btn.className='detail-close'+(!isClosed?' reopen':'');$('addPanelWrap').style.display=!isClosed?'none':'';showToast(!isClosed?'Trip closed 🔒':'Trip reopened 🔓');}catch(e){showToast('Error: '+e.message);}finally{btn.disabled=false;}}
 async function openTrip(id) {
   activeTrip=trips.find(t=>t.id===id);
   if(!activeTrip) return;
   $('viewTrips').classList.remove('active');
   $('viewDetail').classList.add('active');
   $('detailTitle').textContent=activeTrip.name;
-  $('expRows').innerHTML=loadingHTML('Loading expenses…');
-  $('sumTotal').textContent='—';$('sumMiles').textContent='—';$('sumRec').textContent='—';
+  $('expRows').innerHTML=loadingHTML('Loading expensesÃ¢ÂÂ¦');
+  $('sumTotal').textContent='Ã¢ÂÂ';$('sumMiles').textContent='Ã¢ÂÂ';$('sumRec').textContent='Ã¢ÂÂ';
   const ownTrip=activeTrip.userEmail===currentUser.email;
+  const _b=activeTrip.billing||''; const _bb=$('billingNoteBar'); if(_bb){_bb.style.display=_b?'':'none'; if(_b)$('billingNoteText').textContent=_b;}
   $('addPanelWrap').style.display=ownTrip?'':'none';
   $('renameBtn').style.display=ownTrip?'':'none';
+  const _ic=activeTrip.closed===true||activeTrip.closed==='true'; const _cb=$('closeBtn'); if(_cb){if(ownTrip){_cb.style.display='';_cb.textContent=_ic?'🔓 Reopen':'🔒 Close';_cb.className='detail-close'+(_ic?' reopen':'');}else{_cb.style.display='none';}}
   $('fDate').value=new Date().toISOString().split('T')[0];
   selectedCat='other'; buildChips(); clearReceipt();
   $('miTog').checked=false; $('miFields').classList.remove('open'); $('amtRow').style.display='';
@@ -604,12 +605,12 @@ function renderDetail() {
   $('sumMiCost').textContent=money(miCost)+' reimbursable';
   $('sumRec').textContent=recs;
   if(!items.length) {
-    $('expRows').innerHTML='<div class="empty-list">No expenses yet — add your first one above</div>';
+    $('expRows').innerHTML='<div class="empty-list">No expenses yet Ã¢ÂÂ add your first one above</div>';
     return;
   }
   $('expRows').innerHTML=items.map((e,i)=>{
     const cat=catById(e.cat);
-    const sub=[e.vendor,e.miles?(+e.miles).toFixed(1)+' mi':null,e.notes].filter(Boolean).join(' · ');
+    const sub=[e.vendor,e.miles?(+e.miles).toFixed(1)+' mi':null,e.notes].filter(Boolean).join(' ÃÂ· ');
     const hasRec=e.hasReceipt==='true'||e.hasReceipt===true;
     const ownExp=e.userEmail===currentUser.email;
     return `
@@ -619,12 +620,12 @@ function renderDetail() {
         <div class="exp-desc">${escHtml(e.desc)}</div>
         <div class="exp-sub">
           <span>${fmtDate(e.date)}</span>
-          ${sub?`<span>· ${escHtml(sub)}</span>`:''}
-          ${hasRec?`<span class="rbadge" onclick="viewReceipt('${e.id}')">📎 Receipt</span>`:''}
+          ${sub?`<span>ÃÂ· ${escHtml(sub)}</span>`:''}
+          ${hasRec?`<span class="rbadge" onclick="viewReceipt('${e.id}')">Ã°ÂÂÂ Receipt</span>`:''}
         </div>
       </div>
       <div class="exp-amt">${money(e.amt)}</div>
-      ${ownExp||isAdmin?`<button class="exp-del" onclick="deleteExpense('${e.id}')" title="Delete">✕</button>`:''}
+      ${ownExp||isAdmin?`<button class="exp-del" onclick="deleteExpense('${e.id}')" title="Delete">Ã¢ÂÂ</button>`:''}
     </div>`;
   }).join('');
 }
@@ -689,7 +690,7 @@ async function saveExpense() {
     amt=parseFloat($('fAmt').value);
     if(isNaN(amt)||amt<=0){showToast('Enter a valid amount.');return;}
   }
-  const btn=$('saveBtn'); btn.disabled=true; btn.textContent='Saving…';
+  const btn=$('saveBtn'); btn.disabled=true; btn.textContent='SavingÃ¢ÂÂ¦';
   try {
     const expense={
       id:uid(),userEmail:currentUser.email,userName:currentUser.name,
@@ -707,7 +708,7 @@ async function saveExpense() {
     $('miTog').checked=false;$('miFields').classList.remove('open');$('amtRow').style.display='';
     selectedCat='other'; buildChips(); clearReceipt(); closeAdd();
     renderDetail();
-    showToast('Expense saved ✓');
+    showToast('Expense saved Ã¢ÂÂ');
   } catch(e) {
     showToast('Error: '+e.message);
   } finally {
@@ -728,7 +729,7 @@ async function deleteExpense(id) {
 function viewReceipt(expId) {
   const exp=activeExpenses.find(e=>e.id===expId);
   if(exp&&exp.receipt){ $('lbImg').src=exp.receipt; $('lightbox').classList.add('open'); }
-  else { showToast('Receipt image not loaded — reload the trip to view attachments.'); }
+  else { showToast('Receipt image not loaded Ã¢ÂÂ reload the trip to view attachments.'); }
 }
 function closeLightbox(){$('lightbox').classList.remove('open');}
 
@@ -736,7 +737,7 @@ function buildCSV(tripObj,expenses) {
   const header=['Date','Description','Category','Amount','Miles','Vendor','Notes','Receipt'];
   const rows=expenses.map(e=>{
     const cat=catById(e.cat);
-    return[e.date,e.desc,cat.label,(+e.amt).toFixed(2),(+e.miles)||'',e.vendor||'',e.notes||'',e.hasReceipt==='true'?'Yes':'No'];
+    const cleanDate=(e.date||'').split('T')[0]; return[cleanDate,e.desc,cat.label,(+e.amt).toFixed(2),(+e.miles)||'',e.vendor||'',e.notes||'',e.hasReceipt==='true'?'Yes':'No'];
   });
   const total=expenses.reduce((s,e)=>s+(+e.amt||0),0);
   rows.push(['','','TOTAL',total.toFixed(2),'','','','']);
@@ -752,7 +753,7 @@ function exportTripCSV(){
   dl(`${activeTrip.name.replace(/\s+/g,'-')}.csv`,buildCSV(activeTrip,activeExpenses));
 }
 async function exportAllCSV() {
-  showToast('Preparing export…');
+  showToast('Preparing exportÃ¢ÂÂ¦');
   try {
     const res=await api('getTrips');
     let all='';
@@ -766,5 +767,6 @@ async function exportAllCSV() {
 
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
 </script>
-</body>
-</html>
+
+
+</body></html>
