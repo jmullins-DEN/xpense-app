@@ -111,14 +111,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .chip{padding:5px 12px;border-radius:20px;border:1px solid var(--rule);background:transparent;font-size:12px;font-family:var(--sans);color:var(--ink2);cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:5px;}
 .chip:hover{border-color:var(--ink3);}
 .chip.on{background:var(--ink);border-color:var(--ink);color:#fff;}
-.mi-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
-.tog-wrap{position:relative;width:36px;height:20px;flex-shrink:0;}
-.tog-wrap input{opacity:0;width:0;height:0;}
-.tog-slider{position:absolute;inset:0;background:var(--rule);border-radius:20px;cursor:pointer;transition:background 0.2s;}
-.tog-slider::before{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
-.tog-wrap input:checked+.tog-slider{background:var(--ink);}
-.tog-wrap input:checked+.tog-slider::before{transform:translateX(16px);}
-.mi-label{font-size:13px;color:var(--ink2);}
+/* mileage toggle removed */
 .mf{display:none;}
 .mf.open{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
 .mi-note{font-size:11px;color:var(--ink3);margin-top:4px;grid-column:1/-1;}
@@ -192,6 +185,25 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .pd-row .field{flex:1;}
 .pd-rate-note{font-size:11px;color:var(--blue);margin-left:4px;}
 
+
+.vars-modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.vars-modal-overlay.open{display:flex;}
+.vars-modal{background:var(--card);border-radius:14px;padding:24px;width:100%;max-width:440px;box-shadow:0 16px 48px rgba(0,0,0,0.2);animation:popIn 0.18s ease;}
+.vars-modal-title{font-family:var(--display);font-weight:700;font-size:17px;margin-bottom:4px;letter-spacing:-0.02em;}
+.vars-modal-sub{font-size:12px;color:var(--ink3);margin-bottom:20px;}
+.vars-section{margin-bottom:18px;}
+.vars-section-label{font-family:var(--display);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:10px;}
+.vars-row{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
+.vars-row-label{flex:1;font-size:13px;color:var(--ink2);font-weight:500;}
+.vars-row-desc{font-size:11px;color:var(--ink3);margin-top:1px;}
+.vars-input-wrap{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.vars-prefix{font-size:13px;color:var(--ink3);font-weight:500;}
+.vars-input{width:80px;padding:7px 10px;border:1px solid var(--rule);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper);outline:none;text-align:right;transition:border-color 0.15s;}
+.vars-input:focus{border-color:var(--ink);}
+.vars-suffix{font-size:12px;color:var(--ink3);}
+.vars-divider{border:none;border-top:1px solid var(--rule);margin:16px 0;}
+.vars-save-note{font-size:11px;color:var(--ink3);text-align:center;margin-top:8px;}
+
 .comment-input-row{padding:12px 16px;border-top:1px solid var(--rule);display:flex;gap:8px;align-items:flex-end;}
 .comment-input{flex:1;padding:8px 11px;border:1px solid var(--rule);border-radius:8px;font-family:var(--sans);font-size:13px;color:var(--ink);background:var(--paper);outline:none;resize:none;transition:border-color 0.15s;min-height:36px;max-height:100px;}
 .comment-input:focus{border-color:var(--ink);}
@@ -264,6 +276,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
           <select class="admin-select" id="adminUserFilter" onchange="onAdminFilterChange()">
             <option value="">All Users</option>
           </select>
+          <button class="topbar-btn admin" onclick="openVarsModal()" style="font-size:11px;padding:5px 10px;">⚙️ Rates</button>
         </div>
       </div>
       <div class="trips-header">
@@ -317,10 +330,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
             <div class="field"><label>Date</label><input type="date" id="fDate"></div>
           </div>
           <div class="field" style="margin-bottom:10px;"><label>Category</label><div class="chip-row" id="chipRow"></div></div>
-          <div class="mi-row">
-            <label class="tog-wrap"><input type="checkbox" id="miTog" onchange="onMiTog()"><span class="tog-slider"></span></label>
-            <span class="mi-label">This is a mileage expense</span>
-          </div>
+
           <div class="pd-row" id="pdRow" style="display:none;">
             <div class="field"><label>Days</label><input type="number" id="fDays" placeholder="1" min="1" step="1" oninput="onDaysChange()"></div>
             <span class="pd-rate-note">× $<span id="pdRateDisplay">60</span>/day</span>
@@ -328,8 +338,8 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
           <div class="mf" id="miFields">
             <div class="field"><label>Start Odo</label><input type="number" id="fOdoS" placeholder="45200"></div>
             <div class="field"><label>End Odo</label><input type="number" id="fOdoE" placeholder="45258"></div>
-            <div class="field"><label>Rate ($/mi)</label><input type="number" id="fRate" value="0.725" step="0.001"></div>
-            <div class="mi-note">Current rate: $0.725/mi</div>
+            <div class="field"><label>Rate ($/mi)</label><input type="number" id="fRate" step="0.001"></div>
+            <div class="mi-note" id="miRateNote">Current rate: $0.725/mi</div>
           </div>
           <div class="fg" id="amtRow">
             <div class="field"><label>Amount ($)</label><input type="number" id="fAmt" placeholder="0.00" step="0.01" min="0"></div>
@@ -390,6 +400,50 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
   <img id="lbImg" src="" alt="Receipt">
 </div>
 
+<!-- VARIABLES MODAL -->
+<div class="vars-modal-overlay" id="varsModal">
+  <div class="vars-modal">
+    <div class="vars-modal-title">⚙️ Rate Configuration</div>
+    <div class="vars-modal-sub">Changes apply immediately for all new expenses.</div>
+    <hr class="vars-divider">
+    <div class="vars-section">
+      <div class="vars-section-label">Mileage</div>
+      <div class="vars-row">
+        <div>
+          <div class="vars-row-label">Reimbursement Rate</div>
+          <div class="vars-row-desc">IRS standard mileage rate</div>
+        </div>
+        <div class="vars-input-wrap">
+          <span class="vars-prefix">$</span>
+          <input class="vars-input" type="number" id="varMileageRate" step="0.001" min="0" placeholder="0.725">
+          <span class="vars-suffix">/mi</span>
+        </div>
+      </div>
+    </div>
+    <hr class="vars-divider">
+    <div class="vars-section">
+      <div class="vars-section-label">Per Diem</div>
+      <div class="vars-row">
+        <div>
+          <div class="vars-row-label">Daily Rate</div>
+          <div class="vars-row-desc">Meals &amp; incidentals per day</div>
+        </div>
+        <div class="vars-input-wrap">
+          <span class="vars-prefix">$</span>
+          <input class="vars-input" type="number" id="varPerDiemRate" step="1" min="0" placeholder="60">
+          <span class="vars-suffix">/day</span>
+        </div>
+      </div>
+    </div>
+    <hr class="vars-divider">
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeVarsModal()">Cancel</button>
+      <button class="btn-save" onclick="saveVars()">Save Rates</button>
+    </div>
+    <div class="vars-save-note" id="varsSaveNote"></div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
@@ -399,7 +453,7 @@ const ADMIN_EMAIL     = 'jmullins@synergy-solutionsllc.com';
 
 const CATS = [
   {id:'meals',   label:'Meals',   icon:'🍽️', bg:'#fce7f3'},
-  {id:'travel',  label:'Travel',  icon:'✈️',  bg:'#dbeafe'},
+  {id:'travel',  label:'Flight',  icon:'✈️',  bg:'#dbeafe'},
   {id:'lodging', label:'Lodging', icon:'🏨',  bg:'#ede9fe'},
   {id:'fuel',    label:'Fuel',    icon:'⛽',  bg:'#fef3c7'},
   {id:'mileage', label:'Mileage', icon:'🚗',  bg:'#fff7ed'},
@@ -410,7 +464,12 @@ const CATS = [
 ];
 const ICONS = ['✈️','🚗','🏙️','🤝','📊','🏕️','🔧','🎯','💼','🌎'];
 
-const PERDIEM_RATE = 60;
+// ── CONFIGURABLE RATES (admin-editable, persisted in localStorage) ──
+const DEFAULT_MILEAGE_RATE = 0.725;
+const DEFAULT_PERDIEM_RATE = 60;
+let MILEAGE_RATE = parseFloat(localStorage.getItem('xpense_mileage_rate')) || DEFAULT_MILEAGE_RATE;
+let PERDIEM_RATE = parseFloat(localStorage.getItem('xpense_perdiem_rate')) || DEFAULT_PERDIEM_RATE;
+
 let currentUser=null, isAdmin=false, adminMode=false;
 let trips=[], activeTrip=null, activeExpenses=[];
 let selectedCat='other', receiptData=null, selectedIcon=ICONS[0];
@@ -443,6 +502,7 @@ function handleGoogleSignIn(response) {
   else { av.textContent=currentUser.name[0].toUpperCase(); }
   av.title=currentUser.name+' ('+currentUser.email+')';
   if(isAdmin) $('adminBtn').style.display='';
+  initRates();
   loadTrips();
 }
 
@@ -646,7 +706,7 @@ async function openTrip(id) {
   const _ic=activeTrip.closed===true||activeTrip.closed==='true'; const _cb=$('closeBtn'); if(_cb){if(ownTrip){_cb.style.display='';_cb.textContent=_ic?'🔓 Reopen':'🔒 Close';_cb.className='detail-close'+(_ic?' reopen':'');}else{_cb.style.display='none';}}
   $('fDate').value=new Date().toISOString().split('T')[0];
   selectedCat='other'; buildChips(); clearReceipt();
-  $('miTog').checked=false; $('miFields').classList.remove('open'); $('amtRow').style.display=''; $('pdRow').style.display='none'; $('fDays').value='';
+  $('miFields').classList.remove('open');$('amtRow').style.display=''; $('pdRow').style.display='none'; $('fDays').value='';
   // Load comments from trip object
   activeComments = Array.isArray(activeTrip.comments) ? activeTrip.comments : [];
   renderComments();
@@ -723,28 +783,21 @@ function pickCat(id,btn) {
   selectedCat=id;
   $('chipRow').querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));
   btn.classList.add('on');
-  if(id==='mileage'){$('miTog').checked=true;onMiTog();}
-  else{$('miTog').checked=false;onMiTog();}
-  updatePerDiemUI();
-}
-function onMiTog() {
-  const on=$('miTog').checked;
-  $('miFields').classList.toggle('open',on);
-  $('amtRow').style.display=on?'none':'';
-  if(on&&selectedCat!=='mileage'){selectedCat='mileage';buildChips();}
-  updatePerDiemUI();
-}
-function updatePerDiemUI() {
-  const isPD = selectedCat==='perdiem';
+  // mileage fields
+  const isMi = id==='mileage';
+  $('miFields').classList.toggle('open', isMi);
+  // per diem fields
+  const isPD = id==='perdiem';
   $('pdRow').style.display = isPD ? '' : 'none';
   if(isPD) {
     $('amtRow').style.display='none';
-    $('miTog').checked=false;
-    $('miFields').classList.remove('open');
     $('pdRateDisplay').textContent=PERDIEM_RATE;
     onDaysChange();
     setTimeout(()=>$('fDays').focus(),80);
-  } else if(!$('miTog').checked) {
+  } else if(isMi) {
+    $('amtRow').style.display='none';
+    setTimeout(()=>$('fOdoS').focus(),80);
+  } else {
     $('amtRow').style.display='';
   }
 }
@@ -775,10 +828,10 @@ function clearReceipt(){receiptData=null;$('fReceipt').value='';$('rPrev').class
 async function saveExpense() {
   const desc=$('fDesc').value.trim(), date=$('fDate').value;
   if(!desc||!date){showToast('Please enter a description and date.');return;}
-  const isMi=$('miTog').checked;
+  const isMi=selectedCat==='mileage';
   let amt=0,miles=0;
   if(isMi){
-    const s=parseFloat($('fOdoS').value),en=parseFloat($('fOdoE').value),r=parseFloat($('fRate').value)||0.725;
+    const s=parseFloat($('fOdoS').value),en=parseFloat($('fOdoE').value),r=parseFloat($('fRate').value)||MILEAGE_RATE;
     if(isNaN(s)||isNaN(en)||en<=s){showToast('Check odometer readings.');return;}
     miles=en-s; amt=miles*r;
   } else {
@@ -862,6 +915,42 @@ async function exportAllCSV() {
     }
     dl('all-expenses.csv',all);
   } catch(e){showToast('Export error: '+e.message);}
+}
+
+// ── ADMIN RATE VARIABLES ──────────────────────────────
+function openVarsModal() {
+  $('varMileageRate').value = MILEAGE_RATE;
+  $('varPerDiemRate').value = PERDIEM_RATE;
+  $('varsSaveNote').textContent = '';
+  $('varsModal').classList.add('open');
+}
+function closeVarsModal() {
+  $('varsModal').classList.remove('open');
+}
+function saveVars() {
+  const mi = parseFloat($('varMileageRate').value);
+  const pd = parseFloat($('varPerDiemRate').value);
+  if (isNaN(mi) || mi <= 0 || isNaN(pd) || pd <= 0) {
+    $('varsSaveNote').textContent = 'Please enter valid positive numbers.';
+    $('varsSaveNote').style.color = 'var(--red)';
+    return;
+  }
+  MILEAGE_RATE = mi;
+  PERDIEM_RATE = pd;
+  localStorage.setItem('xpense_mileage_rate', mi);
+  localStorage.setItem('xpense_perdiem_rate', pd);
+  // Update displayed rate note if mileage form is open
+  if ($('miRateNote')) $('miRateNote').textContent = `Current rate: $${mi}/mi`;
+  if ($('fRate') && !$('fRate').value) $('fRate').value = mi;
+  $('varsSaveNote').textContent = '✓ Rates saved';
+  $('varsSaveNote').style.color = 'var(--green)';
+  setTimeout(closeVarsModal, 900);
+}
+
+// Init rate display on load
+function initRates() {
+  if ($('fRate')) $('fRate').value = MILEAGE_RATE;
+  if ($('miRateNote')) $('miRateNote').textContent = `Current rate: $${MILEAGE_RATE}/mi`;
 }
 
 function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
