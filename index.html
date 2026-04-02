@@ -72,10 +72,12 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 .admin-stat{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;}
 .admin-stat-label{font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
 .admin-stat-val{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-0.03em;}
-.detail-topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.detail-topbar{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.detail-topbar-title-row{display:flex;align-items:center;gap:10px;}
+.detail-topbar-btn-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
 .back-btn{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;gap:4px;transition:border-color 0.15s;flex-shrink:0;}
 .back-btn:hover{border-color:var(--ink3);}
-.detail-title{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-0.02em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.detail-title{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-0.02em;flex:1;min-width:0;word-break:break-word;}
 .detail-export{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-family:var(--display);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;flex-shrink:0;transition:all 0.15s;}
 .detail-export:hover{border-color:var(--ink3);}
 .detail-rename{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-family:var(--display);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;flex-shrink:0;transition:all 0.15s;}
@@ -88,7 +90,7 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
 @media(max-width:480px){.summary-strip{grid-template-columns:1fr 1fr;}}
 .sum-card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;}
 .sum-label{font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
-.sum-value{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.03em;font-variant-numeric:tabular-nums;}
+.sum-value{font-family:var(--display);font-weight:700;font-size:16px;letter-spacing:-0.01em;font-variant-numeric:tabular-nums;}
 .sum-value.amber{color:var(--amber);}
 .sum-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
 .add-panel{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);margin-bottom:16px;overflow:hidden;}
@@ -275,11 +277,15 @@ body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height
     <div class="view" id="viewDetail">
       <div class="print-header" id="printHeader"><div class="print-header-logo">X<span>.</span>pense</div><div class="print-header-sub" id="printHeaderSub"></div></div>
       <div class="detail-topbar">
-        <button class="back-btn" onclick="goBack()">← Back</button>
-        <div class="detail-title" id="detailTitle"></div>
-        <button class="detail-rename" id="renameBtn" onclick="openRenameModal()">✏️ Rename</button>
-        <button class="detail-export" onclick="exportTripCSV()">⬇ CSV</button>
-        <button class="detail-export" onclick="printTripPDF()" id="pdfBtn">🖨 PDF</button>
+        <div class="detail-topbar-title-row">
+          <button class="back-btn" onclick="goBack()">← Back</button>
+          <div class="detail-title" id="detailTitle"></div>
+        </div>
+        <div class="detail-topbar-btn-row">
+          <button class="detail-rename" id="renameBtn" onclick="openRenameModal()">✏️ Rename</button>
+          <button class="detail-export" onclick="exportTripCSV()">⬇ CSV</button>
+          <button class="detail-export" onclick="printTripPDF()" id="pdfBtn">🖨 PDF</button>
+        </div>
       </div>
       <div class="summary-strip">
         <div class="sum-card"><div class="sum-label">Total</div><div class="sum-value amber" id="sumTotal">—</div><div class="sum-sub" id="sumCount"></div></div>
