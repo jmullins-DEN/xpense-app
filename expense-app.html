@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Xpense</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<!-- Google Sign-In -->
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<style>
+:root {
+  --ink:#111010;--ink2:#4a4845;--ink3:#9b9793;--paper:#faf9f7;--card:#fff;--rule:#ebebea;
+  --amber:#d97706;--amber-bg:#fffbf0;--green:#166534;--green-bg:#f0fdf4;
+  --red:#b91c1c;--red-bg:#fef2f2;--blue:#1d4ed8;--blue-bg:#eff6ff;
+  --sans:'Instrument Sans',sans-serif;--display:'Syne',sans-serif;--r:12px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:var(--sans);background:var(--paper);color:var(--ink);min-height:100vh;-webkit-font-smoothing:antialiased;}
+
+/* ── LOGIN SCREEN ── */
+.login-screen{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:var(--ink);}
+.login-card{background:var(--card);border-radius:20px;padding:40px 36px;width:100%;max-width:380px;text-align:center;box-shadow:0 24px 64px rgba(0,0,0,0.3);}
+.login-logo{font-family:var(--display);font-weight:800;font-size:32px;letter-spacing:-0.04em;margin-bottom:4px;}
+.login-logo span{color:var(--amber);}
+.login-sub{font-size:13px;color:var(--ink3);margin-bottom:32px;}
+.login-divider{font-size:11px;color:var(--ink3);margin:20px 0;}
+.login-note{font-size:11px;color:var(--ink3);margin-top:20px;line-height:1.5;}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--ink);color:#fff;padding:0 16px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:90;}
+.topbar-brand{font-family:var(--display);font-weight:800;font-size:16px;letter-spacing:-0.02em;display:flex;align-items:center;gap:8px;}
+.topbar-dot{width:7px;height:7px;background:var(--amber);border-radius:50%;}
+.topbar-right{display:flex;align-items:center;gap:8px;}
+.topbar-btn{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.15);color:#fff;border-radius:7px;padding:5px 11px;font-family:var(--display);font-size:11px;font-weight:600;letter-spacing:0.04em;cursor:pointer;transition:background 0.15s;}
+.topbar-btn:hover{background:rgba(255,255,255,0.2);}
+.topbar-btn.admin{background:rgba(217,119,6,0.3);border-color:rgba(217,119,6,0.5);}
+.user-avatar{width:28px;height:28px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0;overflow:hidden;}
+.user-avatar img{width:100%;height:100%;object-fit:cover;}
+
+/* ── MAIN ── */
+.main{max-width:880px;margin:0 auto;padding:20px 14px 60px;}
+.view{display:none;}.view.active{display:block;}
+
+/* ── LOADING ── */
+.loading{text-align:center;padding:60px 20px;}
+.spinner{width:32px;height:32px;border:3px solid var(--rule);border-top-color:var(--ink);border-radius:50%;animation:spin 0.7s linear infinite;margin:0 auto 12px;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loading-text{font-size:13px;color:var(--ink3);}
+
+/* ── TRIPS LIST ── */
+.trips-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+.trips-heading{font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-0.03em;}
+.btn-primary{background:var(--ink);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-family:var(--display);font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:opacity 0.15s;}
+.btn-primary:hover{opacity:0.82;}
+.trip-card{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);padding:16px 18px;margin-bottom:10px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color 0.15s,box-shadow 0.15s;animation:fadeUp 0.2s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.trip-card:hover{border-color:var(--ink3);box-shadow:0 2px 12px rgba(0,0,0,0.06);}
+.trip-icon{width:42px;height:42px;border-radius:10px;background:var(--amber-bg);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.trip-info{flex:1;min-width:0;}
+.trip-name{font-family:var(--display);font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.trip-meta{font-size:12px;color:var(--ink3);margin-top:2px;}
+.trip-user-tag{font-size:10px;background:var(--blue-bg);color:var(--blue);border-radius:4px;padding:2px 6px;font-weight:600;}
+.trip-total{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:-0.02em;text-align:right;flex-shrink:0;}
+.trip-count{font-size:11px;color:var(--ink3);text-align:right;margin-top:2px;}
+.trip-arrow{color:var(--ink3);font-size:16px;flex-shrink:0;}
+
+/* ── EMPTY ── */
+.empty-state{text-align:center;padding:60px 20px;}
+.empty-emoji{font-size:48px;margin-bottom:12px;}
+.empty-title{font-family:var(--display);font-weight:700;font-size:18px;margin-bottom:6px;}
+.empty-sub{font-size:14px;color:var(--ink3);margin-bottom:20px;}
+
+/* ── ADMIN BANNER ── */
+.admin-bar{background:linear-gradient(90deg,#78350f,#92400e);color:#fef3c7;padding:10px 16px;border-radius:10px;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;}
+.admin-bar-title{font-family:var(--display);font-weight:700;font-size:13px;}
+.admin-bar-sub{font-size:11px;opacity:0.8;}
+.admin-filter{display:flex;align-items:center;gap:8px;}
+.admin-select{padding:5px 10px;border-radius:7px;border:1px solid rgba(255,255,255,0.3);background:rgba(0,0,0,0.2);color:#fef3c7;font-size:12px;font-family:var(--sans);cursor:pointer;outline:none;}
+
+/* ── ADMIN SUMMARY CARDS ── */
+.admin-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+@media(max-width:600px){.admin-stats{grid-template-columns:1fr 1fr;}}
+.admin-stat{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;}
+.admin-stat-label{font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
+.admin-stat-val{font-family:var(--display);font-weight:800;font-size:20px;letter-spacing:-0.03em;}
+
+/* ── DETAIL ── */
+.detail-topbar{display:flex;align-items:center;gap:12px;margin-bottom:20px;}
+.back-btn{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-size:13px;color:var(--ink2);cursor:pointer;display:flex;align-items:center;gap:4px;transition:border-color 0.15s;flex-shrink:0;}
+.back-btn:hover{border-color:var(--ink3);}
+.detail-title{font-family:var(--display);font-weight:700;font-size:20px;letter-spacing:-0.02em;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.detail-export{background:none;border:1px solid var(--rule);border-radius:8px;padding:7px 12px;font-family:var(--display);font-size:11px;font-weight:600;color:var(--ink2);cursor:pointer;flex-shrink:0;transition:all 0.15s;}
+.detail-export:hover{border-color:var(--ink3);}
+
+/* ── SUMMARY STRIP ── */
+.summary-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:18px;}
+@media(max-width:480px){.summary-strip{grid-template-columns:1fr 1fr;}}
+.sum-card{background:var(--card);border:1px solid var(--rule);border-radius:10px;padding:14px 16px;}
+.sum-label{font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:4px;}
+.sum-value{font-family:var(--display);font-weight:800;font-size:22px;letter-spacing:-0.03em;}
+.sum-value.amber{color:var(--amber);}
+.sum-sub{font-size:11px;color:var(--ink3);margin-top:2px;}
+
+/* ── ADD PANEL ── */
+.add-panel{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);margin-bottom:16px;overflow:hidden;}
+.add-panel-head{padding:13px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;user-select:none;border-bottom:1px solid transparent;transition:border-color 0.15s;}
+.add-panel-head.open{border-color:var(--rule);}
+.add-panel-title{font-family:var(--display);font-weight:600;font-size:13px;}
+.add-toggle{width:28px;height:28px;border-radius:7px;background:var(--ink);color:#fff;border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform 0.2s;pointer-events:none;}
+.add-toggle.open{transform:rotate(45deg);}
+.add-form{display:none;padding:16px;}
+.add-form.open{display:block;}
+
+/* ── FORM ── */
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.fg.full{grid-template-columns:1fr;}
+@media(max-width:520px){.fg{grid-template-columns:1fr;}.mf.open{grid-template-columns:1fr!important;}}
+.field label{display:block;font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.field input,.field select{width:100%;padding:9px 11px;border:1px solid var(--rule);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper);outline:none;transition:border-color 0.15s;-webkit-appearance:none;}
+.field input:focus,.field select:focus{border-color:var(--ink);}
+.chip-row{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.chip{padding:5px 12px;border-radius:20px;border:1px solid var(--rule);background:transparent;font-size:12px;font-family:var(--sans);color:var(--ink2);cursor:pointer;transition:all 0.12s;display:flex;align-items:center;gap:5px;}
+.chip:hover{border-color:var(--ink3);}
+.chip.on{background:var(--ink);border-color:var(--ink);color:#fff;}
+.mi-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
+.tog-wrap{position:relative;width:36px;height:20px;flex-shrink:0;}
+.tog-wrap input{opacity:0;width:0;height:0;}
+.tog-slider{position:absolute;inset:0;background:var(--rule);border-radius:20px;cursor:pointer;transition:background 0.2s;}
+.tog-slider::before{content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;background:#fff;border-radius:50%;transition:transform 0.2s;box-shadow:0 1px 3px rgba(0,0,0,0.15);}
+.tog-wrap input:checked+.tog-slider{background:var(--ink);}
+.tog-wrap input:checked+.tog-slider::before{transform:translateX(16px);}
+.mi-label{font-size:13px;color:var(--ink2);}
+.mf{display:none;}
+.mf.open{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
+.mi-note{font-size:11px;color:var(--ink3);margin-top:4px;grid-column:1/-1;}
+.receipt-area{border:1.5px dashed var(--rule);border-radius:9px;padding:14px;text-align:center;cursor:pointer;transition:border-color 0.15s;margin-bottom:10px;position:relative;}
+.receipt-area:hover{border-color:var(--ink3);}
+.receipt-area input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.receipt-prev{display:none;align-items:center;gap:10px;background:var(--green-bg);border-radius:8px;padding:8px 12px;margin-bottom:10px;}
+.receipt-prev.vis{display:flex;}
+.receipt-prev img{width:40px;height:40px;object-fit:cover;border-radius:6px;flex-shrink:0;}
+.receipt-prev-name{font-size:12px;color:var(--green);flex:1;min-width:0;word-break:break-all;}
+.rclear{background:none;border:none;cursor:pointer;color:var(--ink3);font-size:16px;padding:0 4px;}
+.rclear:hover{color:var(--red);}
+.form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--rule);}
+.btn-ghost{background:none;border:1px solid var(--rule);border-radius:8px;padding:8px 16px;font-family:var(--sans);font-size:13px;color:var(--ink2);cursor:pointer;transition:border-color 0.15s;}
+.btn-ghost:hover{border-color:var(--ink3);}
+.btn-save{background:var(--ink);border:none;border-radius:8px;padding:8px 20px;font-family:var(--display);font-size:13px;font-weight:600;color:#fff;cursor:pointer;transition:opacity 0.15s;}
+.btn-save:hover{opacity:0.82;}
+.btn-save:disabled{opacity:0.4;cursor:not-allowed;}
+
+/* ── EXPENSE LIST ── */
+.exp-list-card{background:var(--card);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden;}
+.exp-row{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--rule);transition:background 0.1s;animation:fadeUp 0.18s ease both;}
+.exp-row:last-child{border-bottom:none;}
+.exp-row:hover{background:#f9f8f6;}
+.exp-cat{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.exp-info{flex:1;min-width:0;}
+.exp-desc{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.exp-sub{font-size:11px;color:var(--ink3);margin-top:1px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.rbadge{background:var(--green-bg);color:var(--green);border-radius:4px;padding:1px 5px;font-size:10px;font-weight:600;cursor:pointer;}
+.exp-amt{font-family:var(--display);font-weight:700;font-size:15px;text-align:right;flex-shrink:0;min-width:70px;}
+.exp-del{background:none;border:none;cursor:pointer;color:var(--ink3);font-size:14px;padding:4px;border-radius:5px;opacity:0;transition:opacity 0.15s,color 0.15s,background 0.15s;flex-shrink:0;}
+.exp-row:hover .exp-del{opacity:1;}
+.exp-del:hover{color:var(--red);background:var(--red-bg);}
+.empty-list{padding:32px 16px;text-align:center;font-size:13px;color:var(--ink3);}
+
+/* ── MODALS ── */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:200;align-items:center;justify-content:center;padding:20px;}
+.overlay.open{display:flex;}
+.modal{background:var(--card);border-radius:14px;padding:24px;width:100%;max-width:400px;box-shadow:0 16px 48px rgba(0,0,0,0.2);animation:popIn 0.18s ease;}
+@keyframes popIn{from{opacity:0;transform:scale(0.95);}to{opacity:1;transform:scale(1);}}
+.modal-title{font-family:var(--display);font-weight:700;font-size:17px;margin-bottom:16px;letter-spacing:-0.02em;}
+.modal-input{width:100%;padding:9px 11px;border:1px solid var(--rule);border-radius:8px;font-family:var(--sans);font-size:14px;color:var(--ink);background:var(--paper);outline:none;margin-bottom:10px;}
+.modal-input:focus{border-color:var(--ink);}
+.modal-label{display:block;font-family:var(--display);font-size:10px;font-weight:600;letter-spacing:0.09em;text-transform:uppercase;color:var(--ink3);margin-bottom:5px;}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:16px;}
+.icon-picker{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 14px;}
+.icon-btn{font-size:22px;background:none;border:2px solid var(--rule);border-radius:8px;width:40px;height:40px;cursor:pointer;transition:border-color 0.12s;}
+.icon-btn.sel{border-color:var(--ink);}
+
+/* ── ERROR TOAST ── */
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;z-index:999;display:none;animation:fadeUp 0.2s ease;}
+.toast.vis{display:block;}
+
+/* ── LIGHTBOX ── */
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:300;align-items:center;justify-content:center;cursor:pointer;}
+.lightbox.open{display:flex;}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:10px;object-fit:contain;}
+
+/* ── CONFIG NOTICE ── */
+.config-notice{background:#fef3c7;border:1px solid #f59e0b;border-radius:10px;padding:14px 16px;margin-bottom:20px;font-size:13px;line-height:1.6;}
+.config-notice strong{font-weight:600;}
+.config-notice code{background:rgba(0,0,0,0.08);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px;}
+
+@media print{.topbar,.add-panel,.back-btn,.detail-export,.exp-del,.topbar-right,.admin-bar{display:none!important;}body{background:white;}.main{padding:0;}.exp-list-card,.sum-card{box-shadow:none;border:1px solid #ddd;}}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="loginScreen" class="login-screen">
+  <div class="login-card">
+    <div class="login-logo">X<span>.</span>pense</div>
+    <div class="login-sub">Business Expense Tracking</div>
+
+    <!-- Google Sign-In button rendered here -->
+    <div id="g_id_onload"
+      data-client_id="1039086156302-29g6ar5o63ememg0k81bltr5096delmc.apps.googleusercontent.com"
+      data-callback="handleGoogleSignIn"
+      data-auto_prompt="false">
+    </div>
+    <div class="g_id_signin"
+      data-type="standard"
+      data-size="large"
+      data-theme="outline"
+      data-text="sign_in_with"
+      data-shape="rectangular"
+      data-logo_alignment="left"
+      data-width="280">
+    </div>
+
+    <div class="login-note">
+      Sign in with your Google account.<br/>
+      Your expenses are private to you.
+    </div>
+  </div>
+</div>
+
+<!-- ── APP ── -->
+<div id="appShell" style="display:none;">
+  <header class="topbar">
+    <div class="topbar-brand"><div class="topbar-dot"></div>X.pense</div>
+    <div class="topbar-right">
+      <button class="topbar-btn" onclick="exportAllCSV()">↓ All CSV</button>
+      <button class="topbar-btn admin" id="adminBtn" onclick="toggleAdminView()" style="display:none;">⚙ Admin</button>
+      <div class="user-avatar" id="userAvatar" title=""></div>
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- CONFIG NOTICE (shown until script URL is set) -->
+    <div class="config-notice" id="configNotice">
+      <strong>⚙️ Setup Required:</strong> Open this file, find <code>APPS_SCRIPT_URL</code> near the top of the &lt;script&gt; tag, and replace it with your Google Apps Script web app URL. See the setup guide below.
+    </div>
+
+    <!-- TRIPS VIEW -->
+    <div class="view active" id="viewTrips">
+      <!-- Admin bar (admin only) -->
+      <div class="admin-bar" id="adminBar" style="display:none;">
+        <div>
+          <div class="admin-bar-title">⚙️ Admin View</div>
+          <div class="admin-bar-sub" id="adminBarSub">Loading summary…</div>
+        </div>
+        <div class="admin-filter">
+          <select class="admin-select" id="adminUserFilter" onchange="onAdminFilterChange()">
+            <option value="">All Users</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="trips-header">
+        <div class="trips-heading" id="tripsHeading">My Trips</div>
+        <button class="btn-primary" onclick="openNewTrip()">＋ New Trip</button>
+      </div>
+      <div id="tripsList"></div>
+    </div>
+
+    <!-- DETAIL VIEW -->
+    <div class="view" id="viewDetail">
+      <div class="detail-topbar">
+        <button class="back-btn" onclick="goBack()">← Back</button>
+        <div class="detail-title" id="detailTitle"></div>
+        <button class="detail-export" onclick="exportTripCSV()">↓ CSV</button>
+      </div>
+
+      <div class="summary-strip">
+        <div class="sum-card"><div class="sum-label">Total</div><div class="sum-value amber" id="sumTotal">—</div><div class="sum-sub" id="sumCount"></div></div>
+        <div class="sum-card"><div class="sum-label">Mileage</div><div class="sum-value" id="sumMiles">—</div><div class="sum-sub" id="sumMiCost"></div></div>
+        <div class="sum-card"><div class="sum-label">Receipts</div><div class="sum-value" id="sumRec">—</div><div class="sum-sub">attached</div></div>
+      </div>
+
+      <!-- Add Panel (hidden for admin viewing others' trips) -->
+      <div class="add-panel" id="addPanelWrap">
+        <div class="add-panel-head" id="addHead" onclick="toggleAdd()">
+          <span class="add-panel-title">Add Expense</span>
+          <button class="add-toggle" id="addToggle">＋</button>
+        </div>
+        <div class="add-form" id="addForm">
+          <div class="fg">
+            <div class="field"><label>Description</label><input type="text" id="fDesc" placeholder="e.g. Gas station"/></div>
+            <div class="field"><label>Date</label><input type="date" id="fDate"/></div>
+          </div>
+          <div class="field" style="margin-bottom:10px;"><label>Category</label><div class="chip-row" id="chipRow"></div></div>
+          <div class="mi-row">
+            <label class="tog-wrap"><input type="checkbox" id="miTog" onchange="onMiTog()"/><span class="tog-slider"></span></label>
+            <span class="mi-label">This is a mileage expense</span>
+          </div>
+          <div class="mf" id="miFields">
+            <div class="field"><label>Start Odo</label><input type="number" id="fOdoS" placeholder="45200"/></div>
+            <div class="field"><label>End Odo</label><input type="number" id="fOdoE" placeholder="45258"/></div>
+            <div class="field"><label>Rate ($/mi)</label><input type="number" id="fRate" value="0.70" step="0.01"/></div>
+            <div class="mi-note">IRS 2025: $0.70/mi</div>
+          </div>
+          <div class="fg" id="amtRow">
+            <div class="field"><label>Amount ($)</label><input type="number" id="fAmt" placeholder="0.00" step="0.01" min="0"/></div>
+            <div class="field"><label>Vendor</label><input type="text" id="fVendor" placeholder="e.g. Hilton"/></div>
+          </div>
+          <div class="fg full" style="margin-bottom:10px;">
+            <div class="field"><label>Notes</label><input type="text" id="fNotes" placeholder="Client, project, purpose…"/></div>
+          </div>
+          <div class="receipt-prev" id="rPrev">
+            <img id="rThumb" src="" alt=""/>
+            <span class="receipt-prev-name" id="rName"></span>
+            <button class="rclear" onclick="clearReceipt()">✕</button>
+          </div>
+          <div class="receipt-area" id="rArea">
+            <input type="file" id="fReceipt" accept="image/*" capture="environment" onchange="onReceipt(event)"/>
+            <div style="font-size:22px;margin-bottom:4px;">📎</div>
+            <div style="font-size:12px;color:var(--ink3);">Tap to attach receipt photo</div>
+          </div>
+          <div class="form-actions">
+            <button class="btn-ghost" onclick="toggleAdd()">Cancel</button>
+            <button class="btn-save" id="saveBtn" onclick="saveExpense()">Save Expense</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="exp-list-card"><div id="expRows"></div></div>
+    </div>
+
+  </main>
+</div>
+
+<!-- NEW TRIP MODAL -->
+<div class="overlay" id="tripModal">
+  <div class="modal">
+    <div class="modal-title">New Trip / Project</div>
+    <div><span class="modal-label">Trip Name</span><input class="modal-input" type="text" id="newTripName" placeholder="e.g. Dallas Sales Visit"/></div>
+    <div><span class="modal-label">Icon</span><div class="icon-picker" id="iconPicker"></div></div>
+    <div class="modal-btns">
+      <button class="btn-ghost" onclick="closeTripModal()">Cancel</button>
+      <button class="btn-save" id="createTripBtn" onclick="createTrip()">Create</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <img id="lbImg" src="" alt="Receipt"/>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// ⚙️  CONFIGURATION — CHANGE THESE TWO VALUES
+// ═══════════════════════════════════════════════════════════
+const APPS_SCRIPT_URL = 'https://script.google.com/a/macros/synergy-solutionsllc.com/s/AKfycbylgIgxoLOJJdvFLMso-_PDJdaBvxF_GQs_-pYKOWSQ7lLc2XV5QisVwsFr6e9Bm-ml/exec';
+const ADMIN_EMAIL     = 'jmullins@synergy-solutionsllc.com';
+// ═══════════════════════════════════════════════════════════
+
+const CATS = [
+  {id:'meals',   label:'Meals',   icon:'🍽️', bg:'#fce7f3'},
+  {id:'travel',  label:'Travel',  icon:'✈️',  bg:'#dbeafe'},
+  {id:'lodging', label:'Lodging', icon:'🏨',  bg:'#ede9fe'},
+  {id:'fuel',    label:'Fuel',    icon:'⛽',  bg:'#fef3c7'},
+  {id:'mileage', label:'Mileage', icon:'🚗',  bg:'#fff7ed'},
+  {id:'supplies',label:'Supplies',icon:'📦',  bg:'#dcfce7'},
+  {id:'parking', label:'Parking', icon:'🅿️', bg:'#e0f2fe'},
+  {id:'other',   label:'Other',   icon:'📎',  bg:'#f3f4f6'},
+];
+const ICONS = ['✈️','🚗','🏙️','🤝','📊','🏕️','🔧','🎯','💼','🌎'];
+
+// ── STATE ────────────────────────────────────────────────────
+let currentUser   = null;  // {email, name, picture, token}
+let isAdmin       = false;
+let adminMode     = false; // admin is viewing all users
+let trips         = [];
+let activeTrip    = null;
+let activeExpenses= [];
+let selectedCat   = 'other';
+let receiptData   = null;
+let selectedIcon  = ICONS[0];
+
+// ── HELPERS ──────────────────────────────────────────────────
+const $ = id => document.getElementById(id);
+const money = n => '$' + (+n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g,',');
+const fmtDate = s => { const d=new Date(s+'T12:00:00'); return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}); };
+const catById = id => CATS.find(c=>c.id===id)||CATS[CATS.length-1];
+const uid = () => 'id_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+
+function showToast(msg, dur=3000) {
+  const t = $('toast'); t.textContent=msg; t.classList.add('vis');
+  setTimeout(()=>t.classList.remove('vis'), dur);
+}
+
+// Check if script URL has been configured
+function checkConfig() {
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    $('configNotice').style.display = 'block';
+  } else {
+    $('configNotice').style.display = 'none';
+  }
+}
+
+// ── GOOGLE SIGN-IN ───────────────────────────────────────────
+function handleGoogleSignIn(response) {
+  const token = response.credential;
+  // Decode JWT payload (not for security — server verifies)
+  const payload = JSON.parse(atob(token.split('.')[1]));
+  currentUser = {
+    email:   payload.email,
+    name:    payload.name || payload.email.split('@')[0],
+    picture: payload.picture || '',
+    token
+  };
+  isAdmin = (currentUser.email === ADMIN_EMAIL);
+
+  // Update UI
+  $('loginScreen').style.display = 'none';
+  $('appShell').style.display = 'block';
+  checkConfig();
+
+  const av = $('userAvatar');
+  if (currentUser.picture) {
+    av.innerHTML = `<img src="${currentUser.picture}" alt=""/>`;
+  } else {
+    av.textContent = currentUser.name[0].toUpperCase();
+  }
+  av.title = currentUser.name + ' (' + currentUser.email + ')';
+
+  if (isAdmin) {
+    $('adminBtn').style.display = '';
+  }
+
+  loadTrips();
+}
+
+// ── API CALLS ─────────────────────────────────────────────────
+async function api(action, extra={}) {
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    throw new Error('Apps Script URL not configured. See setup instructions.');
+  }
+  const body = { action, token: currentUser.token, ...extra };
+  const res = await fetch(APPS_SCRIPT_URL, {
+    method:  'POST',
+    body:    JSON.stringify(body),
+    headers: { 'Content-Type': 'text/plain' }, // avoids CORS preflight
+  });
+  const data = await res.json();
+  if (!data.ok) throw new Error(data.error || 'API error');
+  return data;
+}
+
+// ── TRIPS ─────────────────────────────────────────────────────
+async function loadTrips() {
+  $('tripsList').innerHTML = loadingHTML('Loading trips…');
+  try {
+    const params = {};
+    if (adminMode && $('adminUserFilter').value) {
+      params.filterEmail = $('adminUserFilter').value;
+    }
+    const res = await api('getTrips', params);
+    trips = res.trips || [];
+    renderTrips();
+
+    if (isAdmin) {
+      loadAdminSummary();
+    }
+  } catch(e) {
+    $('tripsList').innerHTML = errorHTML(e.message);
+  }
+}
+
+function loadingHTML(msg='Loading…') {
+  return `<div class="loading"><div class="spinner"></div><div class="loading-text">${msg}</div></div>`;
+}
+function errorHTML(msg) {
+  return `<div class="empty-state"><div class="empty-emoji">⚠️</div><div class="empty-title">Error</div><div class="empty-sub">${msg}</div></div>`;
+}
+
+async function loadAdminSummary() {
+  $('adminBar').style.display = '';
+  try {
+    const res = await api('getAdminSummary');
+    const s = res.summary;
+    $('adminBarSub').textContent = `${s.totalUsers} users · ${s.totalTrips} trips · ${money(s.grandTotal)} total`;
+
+    // Populate user filter
+    const sel = $('adminUserFilter');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">All Users</option>' +
+      (s.byUser||[]).map(u=>`<option value="${u.email}" ${u.email===cur?'selected':''}>${u.name} (${money(u.total)})</option>`).join('');
+  } catch(e) { /* silent */ }
+}
+
+function renderTrips() {
+  const heading = adminMode ? 'All Users — Trips' : 'My Trips';
+  $('tripsHeading').textContent = heading;
+
+  if (!trips.length) {
+    $('tripsList').innerHTML = `
+      <div class="empty-state">
+        <div class="empty-emoji">🧳</div>
+        <div class="empty-title">${adminMode ? 'No trips found' : 'No trips yet'}</div>
+        <div class="empty-sub">${adminMode ? 'No expenses submitted yet.' : 'Create your first trip to start tracking.'}</div>
+        ${!adminMode ? '<button class="btn-primary" onclick="openNewTrip()">＋ Create Trip</button>' : ''}
+      </div>`;
+    return;
+  }
+
+  $('tripsList').innerHTML = trips.map((t,i) => {
+    const showUser = adminMode || isAdmin;
+    return `
+    <div class="trip-card" style="animation-delay:${i*0.04}s" onclick="openTrip('${t.id}')">
+      <div class="trip-icon">${t.icon||'✈️'}</div>
+      <div class="trip-info">
+        <div class="trip-name">${escHtml(t.name)}</div>
+        <div class="trip-meta">
+          ${fmtDate(t.created)}
+          ${showUser ? `<span class="trip-user-tag">👤 ${escHtml(t.userName)}</span>` : ''}
+        </div>
+      </div>
+      <div>
+        <div class="trip-total">—</div>
+        <div class="trip-count">tap to view</div>
+      </div>
+      <div class="trip-arrow">›</div>
+    </div>`;
+  }).join('');
+}
+
+// ── ADMIN ─────────────────────────────────────────────────────
+function toggleAdminView() {
+  adminMode = !adminMode;
+  $('adminBar').style.display = adminMode ? '' : 'none';
+  $('adminBtn').textContent = adminMode ? '← My View' : '⚙ Admin';
+  loadTrips();
+}
+
+function onAdminFilterChange() {
+  loadTrips();
+}
+
+// ── NEW TRIP ──────────────────────────────────────────────────
+function openNewTrip() {
+  selectedIcon = ICONS[0];
+  $('newTripName').value = '';
+  $('iconPicker').innerHTML = ICONS.map(ic =>
+    `<button class="icon-btn${ic===selectedIcon?' sel':''}" onclick="pickIcon('${ic}',this)">${ic}</button>`
+  ).join('');
+  $('tripModal').classList.add('open');
+  setTimeout(()=>$('newTripName').focus(),120);
+}
+function closeTripModal() { $('tripModal').classList.remove('open'); }
+function pickIcon(ic, btn) {
+  selectedIcon = ic;
+  $('iconPicker').querySelectorAll('.icon-btn').forEach(b=>b.classList.remove('sel'));
+  btn.classList.add('sel');
+}
+
+async function createTrip() {
+  const name = $('newTripName').value.trim();
+  if (!name) { $('newTripName').focus(); return; }
+  const btn = $('createTripBtn');
+  btn.disabled = true; btn.textContent = 'Creating…';
+  try {
+    const trip = { id: uid(), name, icon: selectedIcon, created: new Date().toISOString().split('T')[0], userEmail: currentUser.email, userName: currentUser.name, archived: false };
+    await api('saveTrip', { trip });
+    closeTripModal();
+    await loadTrips();
+    openTrip(trip.id);
+  } catch(e) {
+    showToast('Error: ' + e.message);
+  } finally {
+    btn.disabled=false; btn.textContent='Create';
+  }
+}
+
+// ── DETAIL ────────────────────────────────────────────────────
+async function openTrip(id) {
+  activeTrip = trips.find(t=>t.id===id);
+  if (!activeTrip) return;
+
+  $('viewTrips').classList.remove('active');
+  $('viewDetail').classList.add('active');
+  $('detailTitle').textContent = activeTrip.name;
+  $('expRows').innerHTML = loadingHTML('Loading expenses…');
+  $('sumTotal').textContent='—';$('sumMiles').textContent='—';$('sumRec').textContent='—';
+
+  // Hide add panel if admin viewing someone else's trip
+  const ownTrip = activeTrip.userEmail === currentUser.email;
+  $('addPanelWrap').style.display = ownTrip ? '' : 'none';
+
+  // Reset form
+  $('fDate').value = new Date().toISOString().split('T')[0];
+  selectedCat='other'; buildChips(); clearReceipt();
+  $('miTog').checked=false; $('miFields').classList.remove('open'); $('amtRow').style.display='';
+
+  try {
+    const res = await api('getExpenses', { tripId: id });
+    activeExpenses = res.expenses || [];
+    renderDetail();
+  } catch(e) {
+    $('expRows').innerHTML = errorHTML(e.message);
+  }
+}
+
+function goBack() {
+  $('viewDetail').classList.remove('active');
+  $('viewTrips').classList.add('active');
+  closeAdd();
+  activeTrip=null; activeExpenses=[];
+}
+
+function renderDetail() {
+  const items = activeExpenses;
+  const cash  = items.filter(e=>e.cat!=='mileage').reduce((s,e)=>s+(+e.amt||0),0);
+  const miCost= items.filter(e=>e.cat==='mileage').reduce((s,e)=>s+(+e.amt||0),0);
+  const miles = items.filter(e=>e.cat==='mileage').reduce((s,e)=>s+(+e.miles||0),0);
+  const recs  = items.filter(e=>e.hasReceipt==='true'||e.hasReceipt===true).length;
+
+  $('sumTotal').textContent  = money(cash+miCost);
+  $('sumCount').textContent  = `${items.length} expense${items.length!==1?'s':''}`;
+  $('sumMiles').textContent  = miles.toFixed(1)+' mi';
+  $('sumMiCost').textContent = money(miCost)+' reimbursable';
+  $('sumRec').textContent    = recs;
+
+  if (!items.length) {
+    $('expRows').innerHTML = '<div class="empty-list">No expenses yet — add your first one above</div>';
+    return;
+  }
+  $('expRows').innerHTML = items.map((e,i)=>{
+    const cat = catById(e.cat);
+    const sub = [e.vendor, e.miles?(+e.miles).toFixed(1)+' mi':null, e.notes].filter(Boolean).join(' · ');
+    const hasRec = e.hasReceipt==='true'||e.hasReceipt===true;
+    const ownExp = e.userEmail===currentUser.email;
+    return `
+    <div class="exp-row" style="animation-delay:${i*0.03}s">
+      <div class="exp-cat" style="background:${cat.bg}">${cat.icon}</div>
+      <div class="exp-info">
+        <div class="exp-desc">${escHtml(e.desc)}</div>
+        <div class="exp-sub">
+          <span>${fmtDate(e.date)}</span>
+          ${sub?`<span>· ${escHtml(sub)}</span>`:''}
+          ${hasRec?`<span class="rbadge" onclick="viewReceipt('${e.id}')">📎 Receipt</span>`:''}
+        </div>
+      </div>
+      <div class="exp-amt">${money(e.amt)}</div>
+      ${ownExp||isAdmin?`<button class="exp-del" onclick="deleteExpense('${e.id}')" title="Delete">✕</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── ADD PANEL ─────────────────────────────────────────────────
+function toggleAdd() {
+  const form=$('addForm'),head=$('addHead'),tog=$('addToggle');
+  const open=form.classList.toggle('open');
+  head.classList.toggle('open',open); tog.classList.toggle('open',open);
+  if(open) $('fDesc').focus();
+}
+function closeAdd() {
+  $('addForm').classList.remove('open');
+  $('addHead').classList.remove('open');
+  $('addToggle').classList.remove('open');
+}
+function buildChips() {
+  $('chipRow').innerHTML=CATS.map(c=>`<button class="chip${c.id===selectedCat?' on':''}" onclick="pickCat('${c.id}',this)">${c.icon} ${c.label}</button>`).join('');
+}
+function pickCat(id,btn) {
+  selectedCat=id;
+  $('chipRow').querySelectorAll('.chip').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  if(id==='mileage'){$('miTog').checked=true;onMiTog();}
+  else{$('miTog').checked=false;onMiTog();}
+}
+function onMiTog() {
+  const on=$('miTog').checked;
+  $('miFields').classList.toggle('open',on);
+  $('amtRow').style.display=on?'none':'';
+  if(on&&selectedCat!=='mileage'){selectedCat='mileage';buildChips();}
+}
+function onReceipt(e) {
+  const file=e.target.files[0]; if(!file)return;
+  // Resize to max 800px to save sheet storage
+  const img=new Image();
+  const reader=new FileReader();
+  reader.onload=ev=>{
+    img.onload=()=>{
+      const max=800,canvas=document.createElement('canvas');
+      let w=img.width,h=img.height;
+      if(w>max||h>max){if(w>h){h=Math.round(h*max/w);w=max;}else{w=Math.round(w*max/h);h=max;}}
+      canvas.width=w;canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      receiptData=canvas.toDataURL('image/jpeg',0.75);
+      $('rThumb').src=receiptData;$('rName').textContent=file.name;
+      $('rPrev').classList.add('vis');$('rArea').style.display='none';
+    };
+    img.src=ev.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function clearReceipt(){receiptData=null;$('fReceipt').value='';$('rPrev').classList.remove('vis');$('rArea').style.display='';}
+
+async function saveExpense() {
+  const desc=$('fDesc').value.trim(), date=$('fDate').value;
+  if(!desc||!date){showToast('Please enter a description and date.');return;}
+  const isMi=$('miTog').checked;
+  let amt=0,miles=0;
+  if(isMi){
+    const s=parseFloat($('fOdoS').value),en=parseFloat($('fOdoE').value),r=parseFloat($('fRate').value)||0.70;
+    if(isNaN(s)||isNaN(en)||en<=s){showToast('Check odometer readings.');return;}
+    miles=en-s; amt=miles*r;
+  } else {
+    amt=parseFloat($('fAmt').value);
+    if(isNaN(amt)||amt<=0){showToast('Enter a valid amount.');return;}
+  }
+  const btn=$('saveBtn'); btn.disabled=true; btn.textContent='Saving…';
+  try {
+    const expense={
+      id:uid(), userEmail:currentUser.email, userName:currentUser.name,
+      tripId:activeTrip.id, desc, date, cat:selectedCat,
+      amt:parseFloat(amt.toFixed(2)), miles:parseFloat(miles.toFixed(1)),
+      vendor:$('fVendor').value.trim(), notes:$('fNotes').value.trim(),
+      hasReceipt: receiptData ? 'true' : 'false',
+      createdAt: new Date().toISOString()
+    };
+    // Save receipt separately if present (to avoid row size limits)
+    // For simplicity we include it inline — for large deployments consider Google Drive
+    if (receiptData) expense.receipt = receiptData;
+
+    await api('saveExpense', { expense });
+    activeExpenses.unshift(expense);
+
+    // Reset form
+    $('fDesc').value='';$('fAmt').value='';$('fVendor').value='';$('fNotes').value='';
+    $('fOdoS').value='';$('fOdoE').value='';
+    $('miTog').checked=false;$('miFields').classList.remove('open');$('amtRow').style.display='';
+    selectedCat='other'; buildChips(); clearReceipt(); closeAdd();
+    renderDetail();
+    showToast('Expense saved ✓');
+  } catch(e) {
+    showToast('Error: '+e.message);
+  } finally {
+    btn.disabled=false; btn.textContent='Save Expense';
+  }
+}
+
+async function deleteExpense(id) {
+  if(!confirm('Delete this expense?')) return;
+  try {
+    await api('deleteExpense',{expenseId:id});
+    activeExpenses=activeExpenses.filter(e=>e.id!==id);
+    renderDetail();
+    showToast('Deleted');
+  } catch(e){showToast('Error: '+e.message);}
+}
+
+// ── RECEIPT VIEWER ────────────────────────────────────────────
+function viewReceipt(expId) {
+  const exp = activeExpenses.find(e=>e.id===expId);
+  // Receipt data may be stored in the expense object or need a separate fetch
+  if (exp && exp.receipt) {
+    $('lbImg').src = exp.receipt;
+    $('lightbox').classList.add('open');
+  } else {
+    showToast('Receipt image not loaded — reload the trip to view attachments.');
+  }
+}
+function closeLightbox(){$('lightbox').classList.remove('open');}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function buildCSV(tripObj, expenses) {
+  const header=['Date','Description','Category','Amount','Miles','Vendor','Notes','Receipt'];
+  const rows=expenses.map(e=>{
+    const cat=catById(e.cat);
+    return[e.date,e.desc,cat.label,(+e.amt).toFixed(2),(+e.miles)||'',e.vendor||'',e.notes||'',e.hasReceipt==='true'?'Yes':'No'];
+  });
+  const total=expenses.reduce((s,e)=>s+(+e.amt||0),0);
+  rows.push(['','','TOTAL',total.toFixed(2),'','','','']);
+  return[header,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+}
+function dl(filename,content){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([content],{type:'text/csv'}));
+  a.download=filename;a.click();
+}
+function exportTripCSV(){
+  if(!activeTrip||!activeExpenses.length){showToast('No expenses to export.');return;}
+  dl(`${activeTrip.name.replace(/\s+/g,'-')}.csv`, buildCSV(activeTrip,activeExpenses));
+}
+async function exportAllCSV() {
+  showToast('Preparing export…');
+  try {
+    const res=await api('getTrips');
+    let all='';
+    for(const t of res.trips||[]){
+      const er=await api('getExpenses',{tripId:t.id});
+      all+=`=== ${t.name} (${t.userName}) ===\n`+buildCSV(t,er.expenses||[])+'\n\n';
+    }
+    dl('all-expenses.csv',all);
+  } catch(e){showToast('Export error: '+e.message);}
+}
+
+// ── UTILS ────────────────────────────────────────────────────
+function escHtml(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+</script>
+</body>
+</html>
